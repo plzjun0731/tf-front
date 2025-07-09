@@ -5,7 +5,7 @@ import "../styles/AdminAccount.css";
 
 function AdminAccountPage() {
     const [form, setForm] = useState({
-        name: '',
+        guestName: '',
         userId: '',
         userPassword: '',
         email: '',
@@ -17,12 +17,19 @@ function AdminAccountPage() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        const sendData = {
+            memberName: form.guestName,
+            memberId: form.userId,
+            memberPw: form.userPassword,
+            memberEmail: form.email,
+            memberPhone: form.tel
+        }
         try {
-            const result = await createUserAccount(form);
+            const result = await createUserAccount(sendData);
 
             setUsers([...users, { index: users.length + 1, ...result }]);
             setForm({
-                name: "",
+                guestName: "",
                 userId: "",
                 userPassword: "",
                 email: "",
@@ -33,6 +40,16 @@ function AdminAccountPage() {
             alert("계정 등록 중 오류가 발생했습니다.");
             console.error(error);
         }
+    
+        // setUsers([...users, { index: users.length + 1, ...form }]);
+        // setForm({
+        //     guestName: "",
+        //     userId: "",
+        //     userPassword: "",
+        //     email: "",
+        //     tel: ""
+        // });
+        // alert("계정이 등록되었습니다.");
     }
 
     const handleChange = (e) => {
@@ -51,8 +68,7 @@ function AdminAccountPage() {
                         <input 
                             className="input" 
                             type="text" 
-                            name="name"
-                            value={form.name} 
+                            name="guestName"
                             onChange={handleChange}
                             placeholder="OOO" 
                             autoComplete="off"
@@ -61,10 +77,10 @@ function AdminAccountPage() {
                     </label>
                     <label>아이디: 
                         <input 
+                            key="userId"
                             className="input" 
                             type="text" 
                             name="userId"
-                            value={form.userId}
                             onChange={handleChange} 
                             placeholder="ID"
                             autoComplete="off"
@@ -72,13 +88,13 @@ function AdminAccountPage() {
                     </label>
                     <label>비밀번호: 
                         <input 
+                            key="userPassword"
                             className="input" 
                             type="password" 
                             name="userPassword"
-                            value={form.userPassword}
                             onChange={handleChange}
                             placeholder="Password"
-                            autoComplete="off"
+                            autoComplete="new-password"
                         />
                     </label>
                     <label>이메일:  
@@ -86,7 +102,6 @@ function AdminAccountPage() {
                             className="input" 
                             type="email" 
                             name="email"
-                            value={form.email}
                             onChange={handleChange}
                             placeholder="@email" 
                             autoComplete="off"
@@ -97,7 +112,6 @@ function AdminAccountPage() {
                             className="input" 
                             type="tel" 
                             name="tel"
-                            value={form.tel}
                             onChange={handleChange}
                             placeholder="010-0000-0000"
                             autoComplete="off"
@@ -121,11 +135,11 @@ function AdminAccountPage() {
                     {users.map(user => (
                         <tr key={user.index}>
                             <td>{user.index}</td>
-                            <td>{user.name}</td>
-                            <td>{user.userId}</td>
-                            <td>{user.userPassword}</td>
-                            <td>{user.email}</td>
-                            <td>{user.tel}</td>
+                            <td>{user.memberName}</td>
+                            <td>{user.memberId}</td>
+                            <td>{user.memberPw}</td>
+                            <td>{user.memberEmail}</td>
+                            <td>{user.memberPhone}</td>
                         </tr>
                     ))}
                 </tbody>
