@@ -1,0 +1,74 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #1f2d3d;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+}
+.login-container {
+    margin-bottom: 200px; 
+    margin-right: 15px;
+    width: 340px;
+}
+.login-container h2 {
+    margin: 0 0 1rem;
+    text-align: center;
+    font-weight: 300;
+    letter-spacing: 1px;
+    color: #f5c542;
+}
+.login-container form {
+    display: grid;
+    grid-template-columns: 1fr 80px;
+    grid-template-rows: auto auto;
+    gap: 0;
+}
+.login-container input[type="text"],
+.login-container input[type="password"] {
+    padding: 0.75rem 1rem;
+    border: none;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    font-size: 1rem;
+    transition: background-color 0.2s;
+}
+.login-container input[type="text"] {
+    grid-column: 1;
+    grid-row: 1;
+    border-radius: 4px 0 0 0;
+}
+.login-container input[type="password"] {
+    grid-column: 1;
+    grid-row: 2;
+    border-radius: 0 0 0 4px;
+    border-top: none;
+}
+.login-container input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+.login-container input:focus {
+    background-color: rgba(255, 255, 255, 0.15);
+    outline: none;
+}
+.login-container button {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 0 4px 4px 0;
+    background: linear-gradient(135deg, #f5c542, #d4af37);
+    color: #1f2d3d;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+.login-container button:hover {
+    opacity: 0.9;
+}

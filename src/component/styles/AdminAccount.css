@@ -1,0 +1,89 @@
+:root {
+  /* Base */
+  --color-navy-dark: #1F2D3D; 
+  --color-navy-mid:  #192734;
+  --color-navy-light:#2A3A4A;
+
+  /* Accent */
+  --color-gold-light: #F5C542;
+  --color-gold-dark:  #D4AF37;
+
+  /* Transparencies */
+  --white-10: rgba(255,255,255,0.1);
+  --white-15: rgba(255,255,255,0.15);
+  --white-25: rgba(255,255,255,0.25);
+  --white-50: rgba(255,255,255,0.5);
+
+  /* Text */
+  --text-color: #FFFFFF;
+}
+
+.content-area {
+  padding:20px;
+}
+
+/* 공통 버튼 */
+.button {
+  background-color: var(--color-gold-light);
+  color: white;
+  padding: 6px 14px;
+  border: none;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.button:hover {
+  background-color: var(--color-gold-dark);
+}
+
+/* 공통 입력창 */
+.input {
+  padding: 6px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: var(--white-15);
+  color: #ffffff;
+  margin: 10px;
+}
+
+.input:focus {
+  background-color: var(--white-25);
+  outline: none;
+}
+
+.input::placeholder {
+  color: var(--white-50);
+}
+
+/* 공통 테이블 */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+.table th {
+  background-color: var(--color-navy-dark);
+  color: white;
+  padding: 10px;
+}
+.table td {
+  background-color: var(--white-10);
+  color: #ffffff;
+  border: 1px solid #ccc;
+  padding: 10px;
+  text-align: center;
+}
+
+.input-group {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.input-group label {
+  font-weight: bold;
+}
+
