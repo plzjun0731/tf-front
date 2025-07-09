@@ -17,8 +17,15 @@ function AdminAccountPage() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        const sendData = {
+            memberName: form.guestName,
+            memberId: form.userId,
+            memberPw: form.userPassword,
+            memberEmail: form.email,
+            memberPhone: form.tel
+        }
         try {
-            const result = await createUserAccount(form);
+            const result = await createUserAccount(sendData);
 
             setUsers([...users, { index: users.length + 1, ...result }]);
             setForm({
@@ -128,11 +135,11 @@ function AdminAccountPage() {
                     {users.map(user => (
                         <tr key={user.index}>
                             <td>{user.index}</td>
-                            <td>{user.guestName}</td>
-                            <td>{user.userId}</td>
-                            <td>{user.userPassword}</td>
-                            <td>{user.email}</td>
-                            <td>{user.tel}</td>
+                            <td>{user.memberName}</td>
+                            <td>{user.memberId}</td>
+                            <td>{user.memberPw}</td>
+                            <td>{user.memberEmail}</td>
+                            <td>{user.memberPhone}</td>
                         </tr>
                     ))}
                 </tbody>
