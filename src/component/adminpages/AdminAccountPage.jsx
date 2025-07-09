@@ -1,67 +1,38 @@
+// AdminAccountPage.jsx
 import React, { useState } from "react";
+import { createUserAccount } from "../../services/api";
 import "../styles/AdminAccount.css";
 
 function AdminAccountPage() {
     const [form, setForm] = useState({
         name: '',
-        id: '',
-        password: '',
+        userId: '',
+        userPassword: '',
         email: '',
         tel: ''
     });
 
-    const [users, setUsers] = useState([
-    
-    ]);
+    const [users, setUsers] = useState([]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        /*
+
         try {
-            const response = await fetch("/api/account", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(form)
-            });
+            const result = await createUserAccount(form);
 
-            if (!response.ok) {
-                throw new Error("계정 등록 실패");
-            }
-
-            const result = await response.json();
-
-            setUsers([...users, {index: users.length + 1, ...form}])
-
+            setUsers([...users, { index: users.length + 1, ...result }]);
             setForm({
-                name: '',
-                id: '',
-                password: '',
-                email: '',
-                tel: ''
+                name: "",
+                userId: "",
+                userPassword: "",
+                email: "",
+                tel: ""
             });
-            alert("계정이 등록되었습니다. ");            
+            alert("계정이 등록되었습니다.");
         } catch (error) {
-            alert("계정 등록 중 오류가 발생했습니다.")
+            alert("계정 등록 중 오류가 발생했습니다.");
+            console.error(error);
         }
-        */
-        // 새 사용자를 목록에 추가
-        const newUser = {
-            index: users.length + 1,
-            ...form
-        };
-        
-        setUsers([...users, newUser]);
-        
-        // 폼 초기화
-        setForm({
-            name: '',
-            id: '',
-            password: '',
-            email: '',
-            tel: ''
-        });
     }
 
     const handleChange = (e) => {
@@ -73,94 +44,93 @@ function AdminAccountPage() {
     }
 
     return (
-        <>
-            <div className="content-area">
-                <form onSubmit={handleSubmit}>
-                    <div className="input-group">
-                        <label>이름: 
-                            <input 
-                                className="input" 
-                                type="text" 
-                                name="name"
-                                value={form.name} 
-                                onChange={handleChange}
-                                placeholder="OOO" 
-                                required
-                            />
-                        </label>
-                        <label>아이디: 
-                            <input 
-                                className="input" 
-                                type="text" 
-                                name="id"
-                                value={form.id}
-                                onChange={handleChange} 
-                                placeholder="ID"
-                                required
-                            />
-                        </label>
-                        <label>비밀번호: 
-                            <input 
-                                className="input" 
-                                type="password" 
-                                name="password"
-                                value={form.password}
-                                onChange={handleChange}
-                                placeholder="Password"
-                                required
-                            />
-                        </label>
-                        <label>이메일:  
-                            <input 
-                                className="input" 
-                                type="email" 
-                                name="email"
-                                value={form.email}
-                                onChange={handleChange}
-                                placeholder="@email" 
-                                required
-                            />
-                        </label>
-                        <label>전화번호: 
-                            <input 
-                                className="input" 
-                                type="tel" 
-                                name="tel"
-                                value={form.tel}
-                                onChange={handleChange}
-                                placeholder="010-0000-0000"
-                                required
-                            />
-                        </label>
-                        <button className="button" type="submit">저장</button>
-                    </div>
-                </form>
-                <table className="table">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>이름</th>
-                            <th>아이디</th>
-                            <th>비밀번호</th>
-                            <th>이메일</th>
-                            <th>전화번호</th>
+        <div className="content-area">
+            <form onSubmit={handleSubmit} autoComplete="off">
+                <div className="input-group">
+                    <label>이름: 
+                        <input 
+                            className="input" 
+                            type="text" 
+                            name="name"
+                            value={form.name} 
+                            onChange={handleChange}
+                            placeholder="OOO" 
+                            autoComplete="off"
+                            required
+                        />
+                    </label>
+                    <label>아이디: 
+                        <input 
+                            className="input" 
+                            type="text" 
+                            name="userId"
+                            value={form.userId}
+                            onChange={handleChange} 
+                            placeholder="ID"
+                            autoComplete="off"
+                        />
+                    </label>
+                    <label>비밀번호: 
+                        <input 
+                            className="input" 
+                            type="password" 
+                            name="userPassword"
+                            value={form.userPassword}
+                            onChange={handleChange}
+                            placeholder="Password"
+                            autoComplete="off"
+                        />
+                    </label>
+                    <label>이메일:  
+                        <input 
+                            className="input" 
+                            type="email" 
+                            name="email"
+                            value={form.email}
+                            onChange={handleChange}
+                            placeholder="@email" 
+                            autoComplete="off"
+                        />
+                    </label>
+                    <label>전화번호: 
+                        <input 
+                            className="input" 
+                            type="tel" 
+                            name="tel"
+                            value={form.tel}
+                            onChange={handleChange}
+                            placeholder="010-0000-0000"
+                            autoComplete="off"
+                        />
+                    </label>
+                    <button className="adac-save-button" type="submit">저장</button>
+                </div>
+            </form>
+            <table className="table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>이름</th>
+                        <th>아이디</th>
+                        <th>비밀번호</th>
+                        <th>이메일</th>
+                        <th>전화번호</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {users.map(user => (
+                        <tr key={user.index}>
+                            <td>{user.index}</td>
+                            <td>{user.name}</td>
+                            <td>{user.userId}</td>
+                            <td>{user.userPassword}</td>
+                            <td>{user.email}</td>
+                            <td>{user.tel}</td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        {users.map(user => (
-                            <tr key={user.index}>
-                                <td>{user.index}</td>
-                                <td>{user.name}</td>
-                                <td>{user.id}</td>
-                                <td>{user.password}</td>
-                                <td>{user.email}</td>
-                                <td>{user.tel}</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>  
-            </div>                  
-        </>
+                    ))}
+                </tbody>
+            </table>  
+        </div>                  
     );
 }
 
