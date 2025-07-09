@@ -9,7 +9,8 @@ function AdminAccountPage() {
         userId: '',
         userPassword: '',
         email: '',
-        tel: ''
+        tel: '',
+        userRole: 'guest'
     });
 
     const [users, setUsers] = useState([]);
@@ -22,8 +23,10 @@ function AdminAccountPage() {
             memberId: form.userId,
             memberPw: form.userPassword,
             memberEmail: form.email,
-            memberPhone: form.tel
+            memberPhone: form.tel,
+            memberRole: form.userRole === 'guest' ? 2 : 1
         }
+
         try {
             const result = await createUserAccount(sendData);
 
@@ -33,7 +36,8 @@ function AdminAccountPage() {
                 userId: "",
                 userPassword: "",
                 email: "",
-                tel: ""
+                tel: "",
+                userRole: "guest"
             });
             alert("계정이 등록되었습니다.");
         } catch (error) {
@@ -47,7 +51,8 @@ function AdminAccountPage() {
         //     userId: "",
         //     userPassword: "",
         //     email: "",
-        //     tel: ""
+        //     tel: "",
+        //     userRole: "guest"
         // });
         // alert("계정이 등록되었습니다.");
     }
@@ -117,6 +122,16 @@ function AdminAccountPage() {
                             autoComplete="off"
                         />
                     </label>
+                    <label>계정 구분: 
+                        <select
+                            className="input"
+                            name="userRole"
+                            onChange={handleChange}
+                        >
+                            <option value="guest" style={{color: "#1F2D3D"}}>게스트</option>
+                            <option value="admin" style={{color: "#1F2D3D"}}>관리자</option>
+                        </select>
+                    </label>
                     <button className="adac-save-button" type="submit">저장</button>
                 </div>
             </form>
@@ -129,6 +144,7 @@ function AdminAccountPage() {
                         <th>비밀번호</th>
                         <th>이메일</th>
                         <th>전화번호</th>
+                        <th>계정구분</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -140,6 +156,7 @@ function AdminAccountPage() {
                             <td>{user.memberPw}</td>
                             <td>{user.memberEmail}</td>
                             <td>{user.memberPhone}</td>
+                            <td>{user.userRole === 'guest' ? '게스트' : '관리자'}</td>
                         </tr>
                     ))}
                 </tbody>
