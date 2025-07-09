@@ -28,11 +28,47 @@ export async function createUserAccount(formData) {
     const response = await fetch(`${API_BASE_URL}/api/signUp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify(formData),
     });
 
     if (!response.ok) {
-        throw new Error("계정 등록 실패");
+        const error = new Error("계정 등록 실패");
+        error.status = response.status;
+        throw error;
+    }
+
+    return await response.json();
+}
+
+export async function boardManual(formData) {
+    const response = await fetch(`${API_BASE_URL}/api/manual`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(formData),
+    });
+
+    if (!response.ok) {
+        const error = new Error("전송 실패");
+        error.status = response.status;
+        throw error;
+    }
+
+    return await response.json();
+}
+
+export async function getBoardManual() {
+    const response = await fetch(`${API_BASE_URL}/api/manual`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+    });
+
+    if (!response.ok) {
+        const error = new Error("불러오기 실패");
+        error.status = response.status;
+        throw error;
     }
 
     return await response.json();
