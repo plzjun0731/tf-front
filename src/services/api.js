@@ -42,34 +42,82 @@ export async function createUserAccount(formData) {
 }
 
 export async function boardManual(formData) {
-    const response = await fetch(`${API_BASE_URL}/api/manual`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify(formData),
-    });
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/wrtieManual`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify(formData),
+        });
 
-    if (!response.ok) {
-        const error = new Error("전송 실패");
-        error.status = response.status;
+        if (!response.ok) {
+            let errorMessage = "전송 실패";
+            try {
+                const errorData = await response.json();
+                errorMessage = errorData.message || errorData.error || errorMessage;
+            } catch {
+                errorMessage = `HTTP ${response.status}: ${response.statusText}`
+            }
+
+            const error = new Error(errorMessage);
+            error.status = response.status;
+            throw error;
+        }
+
+        const result = await response.json();
+
+        if (!result || typeof result !== 'object') {
+            throw new Error("서버 응답이 올바르지 않습니다.");
+        }
+
+        return result;
+    } catch (error) {
+        if (error.name === 'TypeError' && error.message.includes('fetch')) {
+            throw new Error("네트워크 연결을 확인해주세요.")
+        }
         throw error;
     }
-
-    return await response.json();
 }
 
 export async function getBoardManual() {
-    const response = await fetch(`${API_BASE_URL}/api/manual`, {
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-    });
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/showManual`, {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+        });
 
-    if (!response.ok) {
-        const error = new Error("불러오기 실패");
-        error.status = response.status;
+        if (!response.ok) {
+            let errorMessage = "불러오기 실패";
+            try {
+                const errorData = await response.json();
+                errorMessage = errorData.message || errorData.error || errorMessage;
+            } catch {
+                errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+            }
+            
+            const error = new Error(errorMessage);
+            error.status = response.status;
+            throw error;
+        }
+
+        const result = await response.json();
+        
+        if (!result || typeof result !== 'object') {
+            throw new Error("서버 응답이 올바르지 않습니다");
+        }
+        
+        return {
+            manual_script: result.manual_script || '',
+            manual_checklist: result.manual_checklist || '',
+            manual_etc: result.manual_etc || '',
+            ...result 
+        };
+        
+    } catch (error) {
+        if (error.name === 'TypeError' && error.message.includes('fetch')) {
+            throw new Error("네트워크 연결을 확인해주세요");
+        }
         throw error;
     }
-
-    return await response.json();
 }
