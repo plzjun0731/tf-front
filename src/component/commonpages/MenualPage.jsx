@@ -43,11 +43,15 @@ function MenualPage() {
     };
 
     useEffect(() => {
+        async function fetchManual() {
+            try {
+            const data = await getBoardManual();
+            console.log(data); // 받아온 JSON 출력
+            } catch (error) {
+            console.error(error);
+            }
+        }
         fetchManual();
-        
-        return () => {
-            isMounted.current = false;
-        };
     }, []);
 
     const handleSubmit = async (e) => {
