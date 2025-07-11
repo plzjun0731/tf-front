@@ -162,10 +162,10 @@ function AdminAccountPage() {
                     {users.map(user => (
                         <tr key={user.index}>
                             <td>{user.index}</td>
-                            <td>{user.memberName}</td>
-                            <td>{user.memberId}</td>
-                            <td>{user.memberEmail}</td>
-                            <td>{user.memberPhone}</td>
+                            <td>{user.guestName}</td>
+                            <td>{user.userId}</td>
+                            <td>{user.email}</td>
+                            <td>{user.tel}</td>
                             <td>{user.userRole === 'guest' ? '게스트' : '관리자'}</td>
                         </tr>
                     ))}
