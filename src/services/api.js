@@ -212,43 +212,45 @@ export async function getNoticeList() {
     }
 }
 
-export async function writeNotice() {
-    try {
-        console.log('공지사항 저장 요청:', notice);
-        const response = await fetch(`${API_BASE_URL}/api/writeNotice`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
-            body: JSON.stringify(notice),
-        });
+// export async function writeNotice(notice) {
+//     try {
+//         console.log('공지사항 등록 요청:', notice);
+        
+//         const response = await fetch(`${API_BASE_URL}/api/writeNotice`, {
+//             method: "POST",
+//             headers: { "Content-Type": "application/json" },
+//             credentials: "include",
+//             body: JSON.stringify(notice),
+//         });
 
-        if (!response.ok) {
-            let errorMessage = "전송 실패";
-            try {
-                const errorData = await response.json();
-                errorMessage = errorData.message || errorData.error || errorMessage;
-            } catch {
-                errorMessage = `HTTP ${response.status}: ${response.statusText}`
-            }
+//         if (!response.ok) {
+//             let errorMessage = "공지사항 등록 실패";
+//             try {
+//                 const errorData = await response.json();
+//                 errorMessage = errorData.message || errorData.error || errorMessage;
+//             } catch {
+//                 errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+//             }
+            
+//             const error = new Error(errorMessage);
+//             error.status = response.status;
+//             throw error;
+//         }
 
-            const error = new Error(errorMessage);
-            error.status = response.status;
-            throw error;
-        }
-
-        const result = await response.json();
-        console.log('저장 응답:', result);
-
-        if (!result || typeof result !== 'object') {
-            throw new Error("서버 응답이 올바르지 않습니다.");
-        }
-
-        return result;
-    } catch (error) {
-        if (error.name === 'TypeError' && error.message.includes('fetch')) {
-            throw new Error("네트워크 연결을 확인해주세요.")
-        }
-        throw error;
-    }
-}
+//         const result = await response.json();
+//         console.log('등록 응답:', result); 
+        
+//         if (!result || typeof result !== 'object') {
+//             throw new Error("서버 응답이 올바르지 않습니다");
+//         }
+        
+//         return result;
+        
+//     } catch (error) {
+//         if (error.name === 'TypeError' && error.message.includes('fetch')) {
+//             throw new Error("네트워크 연결을 확인해주세요");
+//         }
+//         throw error;
+//     }
+// }
 
