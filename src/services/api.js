@@ -108,9 +108,9 @@ export async function getBoardManual() {
         }
         
         return {
-            manual_script: result.manual_script || '',
-            manual_checklist: result.manual_checklist || '',
-            manual_etc: result.manual_etc || '',
+            manualScript: result.manual_script || '',
+            manualChecklist: result.manual_checklist || '',
+            manualEtc: result.manual_etc || '',
             ...result 
         };
         
