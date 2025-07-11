@@ -5,81 +5,46 @@ function AdminNoticeWritePage({ setPage, onNoticeAdded }) {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [file, setFile] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  // localStorage 함수들을 컴포넌트 내부에 직접 정의
-  const getNotices = () => {
-    try {
-      const notices = localStorage.getItem("notices");
-      return notices ? JSON.parse(notices) : [];
-    } catch (error) {
-      console.error("공지사항 로드 실패:", error);
-      return [];
-    }
-  };
-
-  const saveNotices = (noticeList) => {
-    try {
-      localStorage.setItem("notices", JSON.stringify(noticeList));
-      return true;
-    } catch (error) {
-      console.error("공지사항 저장 실패:", error);
-      return false;
-    }
-  };
-
-  const addNotice = (notice) => {
-    try {
-      const notices = getNotices();
-      const newNotice = {
-        ...notice,
-        id: Date.now(),
-        date: new Date().toISOString().split("T")[0],
-        author: "관리자",
-      };
-
-      const updatedNotices = [newNotice, ...notices];
-      saveNotices(updatedNotices);
-      return newNotice;
-    } catch (error) {
-      console.error("공지사항 추가 실패:", error);
-      return null;
-    }
-  };
-
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!title.trim() || !content.trim()) {
       alert("제목과 내용을 모두 입력해주세요.");
       return;
     }
 
+    if (loading) return;
+
     try {
-      const newNotice = addNotice({
-        title: title.trim(),
-        content: content.trim(),
-        file: file ? file.name : null,
-      });
+      setLoading(true);
 
-      if (newNotice) {
-        alert("공지사항이 등록되었습니다.");
+      const noticeData = {
+        noticeTitle: title.trim(),
+        noticeContent: content.trim(),
+        noticeFile: file ? file.name : null,
+      };
 
-        // 초기화
-        setTitle("");
-        setContent("");
-        setFile(null);
+      console.log('전송할 데이터:', noticeData);
 
-        // 부모 컴포넌트에 알림
-        if (onNoticeAdded) {
-          onNoticeAdded(newNotice);
-        }
+      const result = await writeNotice(noticeData);
+      console.log('저장 성공:', result);
 
-        // 목록 페이지로 이동
-        setPage("notice");
-      } else {
-        alert("공지사항 등록에 실패했습니다.");
+      alert("공지사항이 등록되었습니다.");
+
+      setTitle("");
+      setContent("");
+      setFile(null);
+
+      if (onNoticeAdded) {
+        onNoticeAdded(result);
       }
+
+      setPage("notice");
     } catch (error) {
-      alert("공지사항 등록에 실패했습니다.");
-      console.error("Error saving notice:", error);
+      console.error('공지사항 등록 실패:', error);
+      alert("다시 시도해주세요.")
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -94,18 +59,19 @@ function AdminNoticeWritePage({ setPage, onNoticeAdded }) {
   };
 
   const handleCancel = () => {
-    setTitle("");
-    setContent("");
-    setFile(null);
-    setPage("notice");
+    if (window.confirm("작성 중인 내용이 사라집니다. 작성을 취소하시겠습니까?")) {
+      setTitle("");
+      setContent("");
+      setFile(null);
+      setPage("notice");
+    }
   };
 
   return (
-    <div className="admin-wrapper">
-      <main className="main-content">
-        <div className="notice-write-box">
+    <div className="notice-page-container">
+          <div className="notice-header">
           <h2>새 공지사항 작성</h2>
-
+        </div>
           <div className="form-group">
             <label>제목</label>
             <input
@@ -119,7 +85,7 @@ function AdminNoticeWritePage({ setPage, onNoticeAdded }) {
           <div className="form-group">
             <label>내용</label>
             <textarea
-              rows="10"
+              rows="20"
               placeholder="내용을 입력하세요"
               value={content}
               onChange={(e) => setContent(e.target.value)}
@@ -144,16 +110,13 @@ function AdminNoticeWritePage({ setPage, onNoticeAdded }) {
               등록
             </button>
             <button
-              className="submit-btn"
+              className="cancel-btn"
               onClick={handleCancel}
-              style={{ backgroundColor: "var(--white-25)" }}
             >
               취소
             </button>
           </div>
         </div>
-      </main>
-    </div>
   );
 }
 
