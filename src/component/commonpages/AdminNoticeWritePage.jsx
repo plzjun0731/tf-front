@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { writeNotice } from "../../services/api";
 import "../styles/AdminNotice.css";
 
 function AdminNoticeWritePage({ setPage, onNoticeAdded }) {
