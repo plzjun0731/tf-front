@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { getNoticeList } from "../../services/api";
 import "../styles/AdminNotice.css";
 
 function AdminNoticeListPage({ setPage, setSelectedNotice }) {
@@ -10,60 +11,68 @@ function AdminNoticeListPage({ setPage, setSelectedNotice }) {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-  // localStorage 함수들을 컴포넌트 내부에 직접 정의
-  const getNotices = () => {
-    try {
-      const notices = localStorage.getItem("notices");
-      return notices ? JSON.parse(notices) : [];
-    } catch (error) {
-      console.error("공지사항 로드 실패:", error);
-      return [];
-    }
-  };
+  // const getNotices = () => {
+  //   try {
+  //     const notices = localStorage.getItem("notices");
+  //     return notices ? JSON.parse(notices) : [];
+  //   } catch (error) {
+  //     console.error("공지사항 로드 실패:", error);
+  //     return [];
+  //   }
+  // };
 
-  const saveNotices = (noticeList) => {
-    try {
-      localStorage.setItem("notices", JSON.stringify(noticeList));
-      return true;
-    } catch (error) {
-      console.error("공지사항 저장 실패:", error);
-      return false;
-    }
-  };
+  // const saveNotices = (noticeList) => {
+  //   try {
+  //     localStorage.setItem("notices", JSON.stringify(noticeList));
+  //     return true;
+  //   } catch (error) {
+  //     console.error("공지사항 저장 실패:", error);
+  //     return false;
+  //   }
+  // };
 
   // 컴포넌트 마운트 시 데이터 로드
   useEffect(() => {
-    loadNotices();
+    const fetchNotices = async () => {
+      try {
+        const noticeList = await getNoticeList();
+        setNotices(noticeList);
+      } catch (error) {
+        console.error("공지사항 불러오기 실패:", error);
+        setNotices([]);
+      }
+    }
+    fetchNotices();
   }, []);
 
-  const loadNotices = () => {
-    const savedNotices = getNotices();
-    // if (savedNotices.length === 0) {
-    //   // localStorage가 비어있으면 초기 더미 데이터 추가
-    //   const dummyNotices = [
-    //     {
-    //       id: 1,
-    //       title: "시스템 점검 안내",
-    //       content: "시스템 점검으로 인한 서비스 중단 안내입니다.",
-    //       date: "2024-01-15",
-    //       author: "관리자",
-    //       file: null,
-    //     },
-    //     {
-    //       id: 2,
-    //       title: "새로운 기능 업데이트",
-    //       content: "새로운 기능이 추가되었습니다.",
-    //       date: "2024-01-10",
-    //       author: "관리자",
-    //       file: "update_guide.pdf",
-    //     },
-    //   ];
-    //   saveNotices(dummyNotices);
-    //   setNotices(dummyNotices);
-    // } else {
-    //   setNotices(savedNotices);
-    // }
-  };
+  // const loadNotices = () => {
+  //   const savedNotices = getNotices();
+  //   if (savedNotices.length === 0) {
+  //     // localStorage가 비어있으면 초기 더미 데이터 추가
+  //     const dummyNotices = [
+  //       {
+  //         id: 1,
+  //         title: "시스템 점검 안내",
+  //         content: "시스템 점검으로 인한 서비스 중단 안내입니다.",
+  //         date: "2024-01-15",
+  //         author: "관리자",
+  //         file: null,
+  //       },
+  //       {
+  //         id: 2,
+  //         title: "새로운 기능 업데이트",
+  //         content: "새로운 기능이 추가되었습니다.",
+  //         date: "2024-01-10",
+  //         author: "관리자",
+  //         file: "update_guide.pdf",
+  //       },
+  //     ];
+  //     saveNotices(dummyNotices);
+  //     setNotices(dummyNotices);
+  //   } else {
+  //     setNotices(savedNotices);
+  //   }
+  // };
 
   useEffect(() => {
     const result = notices.filter((n) => {
