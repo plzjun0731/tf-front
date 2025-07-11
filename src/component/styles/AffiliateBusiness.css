@@ -25,22 +25,31 @@
 
 }
 
-/* 공통 버튼 */
 .button {
-  background-color: var(--color-gold-light);
-  color: white;
-  padding: 6px 14px;
+  padding: 8px 15px;
+  background: var(--color-gold-light);
   border: none;
-  border-radius: 4px;
-  font-weight: bold;
+  color: var(--color-navy-dark);
+  text-align: center;
+  font-weight: 600;
+  font-size: 15px;
   cursor: pointer;
+  transition: all 0.3s ease;
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
 .button:hover {
   background-color: var(--color-gold-dark);
+  transform: translateY(1px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
 }
 
-/* 공통 입력창 */
+.button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
 .input {
   padding: 6px;
   border: 1px solid #ccc;
@@ -91,4 +100,18 @@
 .table input:focus {
   outline: none;
 }
+
+.table-scroll::-webkit-scrollbar {
+  height: 7px;
+} 
+
+.table-scroll::-webkit-scrollbar-thumb {
+  background-color: var(--color-gold-dark);
+  border-radius: 4px;
+}
+
+.table-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
 

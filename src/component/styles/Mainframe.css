@@ -1,88 +1,73 @@
 :root {
   /* Navy 계열 */
-  --color-navy-dark: #1F2D3D;   
-  --color-navy-mid:  #192734;   
-  --color-navy-light:#2A3A4A;   
+  --color-navy-dark: #1f2d3d;
+  --color-navy-mid: #192734;
+  --color-navy-light: #2a3a4a;
 
   /* Gold 계열 */
-  --color-gold-light: #F5C542;  
-  --color-gold-dark:  #D4AF37;  
+  --color-gold-light: #f5c542;
+  --color-gold-dark: #d4af37;
 
   /* White 투명도 */
-  --white-10: rgba(255,255,255,0.1);   
-  --white-15: rgba(255,255,255,0.15);  
-  --white-25: rgba(255,255,255,0.25);  
-  --white-50: rgba(255,255,255,0.5);   
+  --white-10: rgba(255, 255, 255, 0.1);
 
   /* 텍스트 */
-  --text-color: #FFFFFF;               
+  --text-color: #ffffff;
 }
 
-html {
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html, body {
   margin: 0;
   padding: 0;
   width: 100%;
   height: 100%;
-  box-sizing: border-box;
-}
-
-*, *::before, *::after {
-  box-sizing: inherit;
-}
-
-body {
-  margin: 0;
-  padding: 0;
-  width: 100vw;
-  height: 100vh;
   font-family: Arial, sans-serif;
   background-color: var(--color-navy-dark);
   color: var(--text-color);
   overflow: hidden;
 }
 
-/* 전체 컨테이너 */
 .container {
   display: flex;
   flex-direction: column;
   height: 100vh;
   width: 100vw;
-  overflow: hidden;
-  margin: 0;
-  padding: 0;
 }
 
-/* 상단 네비바 */
 .navbar {
-  background-color: var(--color-navy-dark);
+  height: 50px;
   padding: 15px 20px;
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  height: 50px;
-  width: 100%;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  z-index: 200;
-  flex-shrink: 0;
+  background-color: var(--color-navy-dark);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .logout-button {
   padding: 8px 15px;
-  color: var(--text-color);
+  font-size: 16px;
+  font-weight: 600;
   border: none;
   border-radius: 6px;
   cursor: pointer;
-  font-size: 16px;
-  background: var(--color-gold-light);
+  background-color: var(--color-gold-light);
+  color: var(--color-navy-dark);
   transition: all 0.3s ease;
-  font-weight: 600;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .logout-button:hover {
-  color: var(--color-navy-mid);
+  background-color: var(--color-gold-dark);
+  transform: translateY(1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
-/* 메인 레이아웃 (사이드바 + 컨텐츠) */
 .main-layout {
   display: flex;
   flex: 1;
@@ -90,53 +75,30 @@ body {
   overflow: hidden;
 }
 
-/* 사이드바 */
 .sidebar {
   width: 200px;
-  height: 100%;
   background-color: var(--color-navy-dark);
-  z-index: 100;
-  flex-shrink: 0;
   overflow-y: auto;
-  transition: width 0.3s ease;
-}
-
-.sidebar.collapsed {
-  width: 60px;
 }
 
 .sidebar-header {
+  margin: 15px;
   padding: 20px;
   background-color: var(--color-navy-mid);
-  color: var(--text-color);
-  text-align: center;
-  margin: 15px;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  transition: all 0.3s ease;
-}
-
-.sidebar.collapsed .sidebar-header {
-  margin: 15px 5px;
-  padding: 10px 5px;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .user-role {
-  font-weight: bold;
   font-size: 18px;
-  color: var(--text-color);
-  margin: 0;
-  transition: font-size 0.3s ease;
-}
-
-.sidebar.collapsed .user-role {
-  font-size: 12px;
+  font-weight: bold;
 }
 
 .menu-list {
   list-style: none;
+  margin: 20px 0 0;
   padding: 0;
-  margin: 20px 0 0 0;
 }
 
 .menu-list li {
@@ -147,27 +109,16 @@ body {
   width: calc(100% - 20px);
   margin: 0 10px;
   padding: 15px 20px;
-  background: none;
   border: none;
+  border-left: 4px solid transparent;
+  border-radius: 6px;
+  background: none;
   color: var(--text-color);
-  text-align: left;
-  font-weight: 500;
   font-size: 16px;
+  font-weight: 500;
+  text-align: left;
   cursor: pointer;
   transition: all 0.3s ease;
-  border-radius: 6px;
-  border-left: 4px solid transparent;
-}
-
-.sidebar.collapsed .menu-button {
-  width: calc(100% - 10px);
-  margin: 0 5px;
-  padding: 15px 5px;
-  text-align: center;
-  font-size: 12px;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
 }
 
 .menu-button:hover {
@@ -175,28 +126,42 @@ body {
   border-left: 4px solid var(--color-gold-light);
 }
 
-.menu-button.active {
+.menu-button.active[data-menu="team-manage"] {
+  background-color: var(--color-navy-mid);
+  border-left: 4px solid var(--color-gold-light);
+}
+
+.menu-button.active:not([data-menu="team-manage"]) {
   background: linear-gradient(135deg, var(--color-gold-light), var(--color-gold-dark));
   color: var(--color-navy-dark);
   border-left: 4px solid var(--color-gold-dark);
   font-weight: 600;
 }
 
-/* 컨텐츠 영역 */
+.sub-menu-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.menu-button.sub-menu {
+  margin-left: 20px;
+  padding: 10px 15px;
+  font-size: 14px;
+}
+
 .content-area {
   flex: 1;
   display: flex;
   flex-direction: column;
-  width: 100%;
   overflow: hidden;
 }
 
-/* 페이지 헤더 */
 .page-header {
-  background-color: var(--color-navy-mid);
   padding: 20px 30px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  width: 100%;
+  background-color: var(--color-navy-mid);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
   flex-shrink: 0;
   display: flex;
   align-items: center;
@@ -210,28 +175,12 @@ body {
   color: var(--text-color);
 }
 
-.sidebar-toggle {
-  background: var(--color-gold-light);
-  color: var(--color-navy-dark);
-  border: none;
-  padding: 8px 12px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: all 0.3s ease;
-}
-
-.sidebar-toggle:hover {
-  background: var(--color-gold-dark);
-}
-
-/* 실제 페이지 컨텐츠 */
 .page-content {
   flex: 1;
-  padding: 0;
-  margin: 0;
-  overflow: auto;
   width: 100%;
   height: 100%;
+  overflow: auto;
+  padding: 0;
   background-color: var(--white-10);
+  border-radius: 8px;
 }

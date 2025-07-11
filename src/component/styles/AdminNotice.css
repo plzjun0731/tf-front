@@ -11,76 +11,87 @@
   --text-color: #FFFFFF;
 }
 
-.page-wrapper {
-  width: 100%; /* 뷰포트 전체 너비 */
-  max-width: 100%;
-  margin: 0;
-  padding: 20px 40px; /* 좌우 여백만 최소한으로 */
-  box-sizing: border-box;
+.notice-page-container {
+  width: 100%;
+  min-height: 75vh;
+  height: auto; /* viewport 높이로 변경 */
+  max-height: none; /* 최대 높이 제한 */
+  padding: 20px;
+  background-color: var(--color-navy-mid);
+  border-radius: 8px;
+  box-sizing: border-box; /* padding 포함 계산 */
+  overflow-y: auto;
+  margin: 0 auto; /* 가운데 정렬 */
 }
 
-
-.page-title {
-  color: var(--text-color);
-  font-size: 1.8rem;
-  font-weight: bold;
-  margin-bottom: 20px;
-}
-
-.notice-tab-bar {
+.notice-header{
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 2px solid var(--white-10);
-  padding-bottom: 10px;
-  margin-bottom: 20px;
-  width: 100%;
+  padding-bottom: 15px;
+  border-bottom: 1px solid var(--white-25);
+  flex-shrink: 0; /* 헤더 크기 고정 */
+  margin-bottom: 0; /* margin 제거 */
 }
 
-.notice-tab-bar button {
-  background: none;
-  border: none;
+.notice-header h2{
+  margin: 0;
   color: var(--text-color);
-  font-weight: bold;
-  margin-right: 20px;
-  cursor: pointer;
-  padding: 6px 10px;
-}
-
-.notice-tab-bar .active {
-  border-bottom: 3px solid var(--color-gold-light);
-  color: var(--color-gold-light);
+  font-size: 1.5em;
 }
 
 .write-btn {
-  background-color: var(--color-gold-light);
-  color: var(--text-color);
-  padding: 6px 14px;
-  border-radius: 4px;
-  font-weight: bold;
+  padding: 8px 15px;
+  background: var(--color-gold-light);
   border: none;
+  color: var(--color-navy-dark);
+  text-align: center;
+  font-weight: 600;
+  font-size: 15px;
   cursor: pointer;
+  transition: all 0.3s ease;
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
 .write-btn:hover {
   background-color: var(--color-gold-dark);
+  transform: translateY(1px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
 }
 
+.wrtie-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
 
 .notice-search {
   display: flex;
   gap: 10px;
-  margin-bottom: 16px;
+  margin: 16px auto;
   width: 100%;
 }
 
-.notice-search select,
-.notice-search input {
-  background-color: var(--white-15);
-  color: white;
-  padding: 6px 10px;
-  border: 1px solid #ccc;
+.notice-search select {
+  padding: 8px 12px;
+  border: 1px solid var(--white-15);
   border-radius: 4px;
+  background-color: var(--white-10);
+  color: var(--text-color);
+  min-width: 80px;
+}
+
+.notice-search option {
+  color: var(--color-navy-dark)
+}
+
+.notice-search input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid var(--white-15);
+  border-radius: 4px;
+  background-color: var(--white-10);
+  color: var(--text-color);
 }
 
 .notice-search input::placeholder {
@@ -88,17 +99,29 @@
 }
 
 .notice-search button {
-  background-color: var(--color-gold-light);
-  color: white;
-  border: none;
   padding: 6px 12px;
-  border-radius: 4px;
+  background: var(--color-gold-light);
+  border: none;
+  color: var(--color-navy-dark);
+  text-align: center;
+  font-weight: 600;
+  font-size: 15px;
   cursor: pointer;
+  transition: all 0.3s ease;
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.notice-search button:hover {
+  background-color: var(--color-gold-dark);
+  transform: translateY(1px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
 }
 
 .notice-count {
+  margin-bottom: 15px;
   color: var(--text-color);
-  margin-bottom: 10px;
+  font-size: 0.9em;
   font-weight: bold;
 }
 
@@ -128,6 +151,11 @@
   margin-right: 10px;
 }
 
+.notice-list li:hover {
+  background-color: var(--white-15);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
+
 .pagination {
   display: flex;
   justify-content: center;
@@ -149,7 +177,6 @@
   font-weight: bold;
 }
 
-
 .notice-write-box {
   background-color: var(--color-navy-light); /* 카드 배경 */
   padding: 30px 40px;
@@ -168,6 +195,7 @@
 }
 
 .form-group {
+  margin-top: 15px;
   margin-bottom: 20px;
   display: flex;
   flex-direction: column;
@@ -203,7 +231,7 @@
 
 .file-btn {
   background-color: var(--color-gold-light);
-  color: var(--text-color);
+  color: var(--color-navy-dark);
   border: none;
   padding: 6px 14px;
   border-radius: 6px;
@@ -219,7 +247,7 @@
   margin-top: 20px;
   padding: 10px 16px;
   background-color: var(--color-gold-light);
-  color: var(--text-color);
+  color: var(--color-navy-dark);
   font-weight: bold;
   font-size: 1rem;
   border: none;
@@ -230,4 +258,22 @@
 
 .submit-btn:hover {
   background-color: var(--color-gold-dark);
+}
+
+.cancel-btn {
+  margin-top: 20px;
+  padding: 10px 16px;
+  background-color: var(--white-25);
+  color: var(--text-color);
+  font-weight: bold;
+  font-size: 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  width: 100%;
+  
+}
+
+.cancel-btn:hover {
+  background-color: var(--white-50);
 }
