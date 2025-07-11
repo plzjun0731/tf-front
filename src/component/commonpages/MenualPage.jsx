@@ -21,9 +21,9 @@ function MenualPage() {
             
             if (isMounted.current) {
                 setFormData({
-                    manualScript: result.manual_script || '',
-                    manualChecklist: result.manual_checklist || '',
-                    manualEtc: result.manual_etc || '',
+                    script: result.manualScript || '',
+                    checklist: result.manualChecklist || '',
+                    etc: result.manualEtc || '',
                 });
             }
         } catch (error) {
@@ -43,14 +43,6 @@ function MenualPage() {
     };
 
     useEffect(() => {
-        async function fetchManual() {
-            try {
-            const data = await getBoardManual();
-            console.log(data); // 받아온 JSON 출력
-            } catch (error) {
-            console.error(error);
-            }
-        }
         fetchManual();
     }, []);
 
