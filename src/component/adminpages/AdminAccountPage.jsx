@@ -43,14 +43,14 @@ function AdminAccountPage() {
             const result = await createUserAccount(sendData);
 
             setUsers([...users, { index: users.length + 1, ...result }]);
-            `setForm({
+            setForm({
                 guestName: "",
                 userId: "",
                 userPassword: "",
                 email: "",
                 tel: "",
                 userRole: "guest"
-            });`
+            });
             alert("계정이 등록되었습니다.");
         } catch (error) {
             alert("계정 등록 중 오류가 발생했습니다.");
