@@ -1,5 +1,5 @@
 // AdminAccountPage.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { createUserAccount, getUserAccount } from "../../services/api";
 import "../styles/AdminAccount.css";
 
