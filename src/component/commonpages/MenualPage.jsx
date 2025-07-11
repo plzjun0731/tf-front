@@ -21,9 +21,9 @@ function MenualPage() {
             
             if (isMounted.current) {
                 setFormData({
-                    script: result.manual_script || '',
-                    checklist: result.manual_checklist || '',
-                    etc: result.manual_etc || '',
+                    manualScript: result.manual_script || '',
+                    manualChecklist: result.manual_checklist || '',
+                    manualEtc: result.manual_etc || '',
                 });
             }
         } catch (error) {
@@ -56,9 +56,9 @@ function MenualPage() {
         if (saving || loading) return;
 
         const sendData = {
-            manual_script: formData.script,
-            manual_checklist: formData.checklist,
-            manual_etc: formData.etc
+            manualScript: formData.script,
+            manualChecklist: formData.checklist,
+            manualEtc: formData.etc
         }
 
         try {
