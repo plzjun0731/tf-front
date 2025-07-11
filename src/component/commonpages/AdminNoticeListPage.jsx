@@ -38,31 +38,31 @@ function AdminNoticeListPage({ setPage, setSelectedNotice }) {
 
   const loadNotices = () => {
     const savedNotices = getNotices();
-    if (savedNotices.length === 0) {
-      // localStorage가 비어있으면 초기 더미 데이터 추가
-      const dummyNotices = [
-        {
-          id: 1,
-          title: "시스템 점검 안내",
-          content: "시스템 점검으로 인한 서비스 중단 안내입니다.",
-          date: "2024-01-15",
-          author: "관리자",
-          file: null,
-        },
-        {
-          id: 2,
-          title: "새로운 기능 업데이트",
-          content: "새로운 기능이 추가되었습니다.",
-          date: "2024-01-10",
-          author: "관리자",
-          file: "update_guide.pdf",
-        },
-      ];
-      saveNotices(dummyNotices);
-      setNotices(dummyNotices);
-    } else {
-      setNotices(savedNotices);
-    }
+    // if (savedNotices.length === 0) {
+    //   // localStorage가 비어있으면 초기 더미 데이터 추가
+    //   const dummyNotices = [
+    //     {
+    //       id: 1,
+    //       title: "시스템 점검 안내",
+    //       content: "시스템 점검으로 인한 서비스 중단 안내입니다.",
+    //       date: "2024-01-15",
+    //       author: "관리자",
+    //       file: null,
+    //     },
+    //     {
+    //       id: 2,
+    //       title: "새로운 기능 업데이트",
+    //       content: "새로운 기능이 추가되었습니다.",
+    //       date: "2024-01-10",
+    //       author: "관리자",
+    //       file: "update_guide.pdf",
+    //     },
+    //   ];
+    //   saveNotices(dummyNotices);
+    //   setNotices(dummyNotices);
+    // } else {
+    //   setNotices(savedNotices);
+    // }
   };
 
   useEffect(() => {
@@ -147,26 +147,23 @@ function AdminNoticeListPage({ setPage, setSelectedNotice }) {
   };
 
   return (
-        <div className="notice-page-container">
-          <div className="notice-header">
-            <h2>
-              공지사항
-            </h2>
-            <button className="write-btn" onClick={handleWriteClick}>
-              글쓰기
-            </button>
-          </div>
-
-          <div className="notice-search">
-            <select
-              value={searchType}
-              onChange={(e) => setSearchType(e.target.value)}
-            >
-              <option value="title">제목</option>
-              <option value="content">내용</option>
-              <option value="author">작성자</option>
-            </select>
-            <input
+    <div className="notice-page-container">
+      <div className="notice-header">
+        <h2>공지사항</h2>
+        <button className="write-btn" onClick={handleWriteClick}>
+          글쓰기
+        </button>
+      </div>
+      <div className="notice-search">
+        <select
+          value={searchType}
+          onChange={(e) => setSearchType(e.target.value)}
+        >
+          <option value="title">제목</option>
+          <option value="content">내용</option>
+          <option value="author">작성자</option>
+        </select>
+        <input
               type="text"
               placeholder="검색어를 입력해주세요."
               value={inputValue}
@@ -222,7 +219,7 @@ function AdminNoticeListPage({ setPage, setSelectedNotice }) {
               </button>
             </div>
           )}
-        </div>
+    </div>
   );
 }
 
