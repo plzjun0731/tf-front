@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { boardManual, getBoardManual } from "../../services/api";
 import "../styles/MenualPage.css";
 
@@ -9,29 +9,51 @@ function MenualPage() {
         etc: ''
     });
 
-    useEffect(() => {
-        const fetchManual = async () => {
-            try {
-                const result = await getBoardManual();
+    const [loading, setLoading] = useState(true);
+    const [saving, setSaving] = useState(false);
+    const isMounted = useRef(true);
+
+    const fetchManual = async () => {
+        if (!isMounted.current) return;
+        
+        try {
+            const result = await getBoardManual();
+            
+            if (isMounted.current) {
                 setFormData({
                     script: result.manual_script || '',
                     checklist: result.manual_checklist || '',
                     etc: result.manual_etc || '',
                 });
-            } catch (error) {
-                console.error('불러오기 실패:', error);
+            }
+        } catch (error) {
+            console.error('불러오기 실패:', error);
+            if (isMounted.current) {
                 setFormData({
                     script: '',
                     checklist: '',
                     etc: ''
                 });
             }
+        } finally {
+            if (isMounted.current) {
+                setLoading(false);
+            }
+        }
+    };
+
+    useEffect(() => {
+        fetchManual();
+        
+        return () => {
+            isMounted.current = false;
         };
-        fetchManual(); 
     }, []);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (saving || loading) return;
 
         const sendData = {
             manual_script: formData.script,
@@ -40,14 +62,20 @@ function MenualPage() {
         }
 
         try {
-            const result = await boardManual(sendData);   
-            console.log('저장 성공:', result);
-            alert('저장되었습니다.')         
+            setSaving(true);
+            await boardManual(sendData);   
+            console.log('저장 성공');
+            alert('저장되었습니다.');
+            
+            await fetchManual();
+            
         } catch (error) {
-            console.error('저장 실패:', error)
-            alert('오류가 발생했습니다.')  
-        } 
-    };    
+            console.error('저장 실패:', error);
+            alert('저장에 실패했습니다.');  
+        } finally {
+            setSaving(false);
+        }
+    };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
