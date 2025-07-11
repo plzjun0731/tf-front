@@ -1,6 +1,6 @@
 // AdminAccountPage.jsx
 import React, { useState } from "react";
-import { createUserAccount } from "../../services/api";
+import { createUserAccount, getUserAccount } from "../../services/api";
 import "../styles/AdminAccount.css";
 
 function AdminAccountPage() {
@@ -14,6 +14,18 @@ function AdminAccountPage() {
     });
 
     const [users, setUsers] = useState([]);
+
+    useEffect(() => {
+        async function fetchUsers() {
+            try {
+                const userList = await getUserAccount();
+            setUsers(userList);
+            } catch (error) {
+                alert(error.message);
+            }
+        }
+        fetchUsers();
+    }, []);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -31,14 +43,14 @@ function AdminAccountPage() {
             const result = await createUserAccount(sendData);
 
             setUsers([...users, { index: users.length + 1, ...result }]);
-            setForm({
+            `setForm({
                 guestName: "",
                 userId: "",
                 userPassword: "",
                 email: "",
                 tel: "",
                 userRole: "guest"
-            });
+            });`
             alert("계정이 등록되었습니다.");
         } catch (error) {
             alert("계정 등록 중 오류가 발생했습니다.");
@@ -141,7 +153,6 @@ function AdminAccountPage() {
                         <th>#</th>
                         <th>이름</th>
                         <th>아이디</th>
-                        <th>비밀번호</th>
                         <th>이메일</th>
                         <th>전화번호</th>
                         <th>계정구분</th>
@@ -153,7 +164,6 @@ function AdminAccountPage() {
                             <td>{user.index}</td>
                             <td>{user.memberName}</td>
                             <td>{user.memberId}</td>
-                            <td>{user.memberPw}</td>
                             <td>{user.memberEmail}</td>
                             <td>{user.memberPhone}</td>
                             <td>{user.userRole === 'guest' ? '게스트' : '관리자'}</td>
