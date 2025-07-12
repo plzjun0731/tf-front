@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { boardManual, getBoardManual } from "../../services/api";
+import { boardManual, getBoardManual } from "../../services/ManualApi";
 import "../styles/MenualPage.css";
 
 function MenualPage() {

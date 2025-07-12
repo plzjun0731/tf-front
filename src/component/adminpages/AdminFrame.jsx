@@ -4,7 +4,7 @@ import AdminAccountPage from './AdminAccountPage';
 import AffiliateBusiness from './AffiliateBusiness';
 import BoardPage from '../commonpages/BoardPage';
 import Calendar from '../commonpages/Calendar';
-import { logoutUser } from '../../services/api';
+import { logoutUser } from '../../services/LoginApi';
 import '../styles/Mainframe.css';
 
 const MENU_ITEMS = [

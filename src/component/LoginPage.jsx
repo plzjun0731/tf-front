@@ -1,6 +1,6 @@
 // LoginPage.jsx
 import React, { useState } from "react";
-import { loginUser } from "../services/api";
+import { loginUser } from "../services/LoginApi";
 import "./styles/LoginPage.css";
 
 function LoginPage({ onLoginSuccess }) {

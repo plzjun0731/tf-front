@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { getNoticeList } from "../../services/api";
+import { getNoticeList } from "../../services/NoticeApi";
 import "../styles/AdminNotice.css";
 
 function AdminNoticeListPage({ setPage, setSelectedNotice }) {
