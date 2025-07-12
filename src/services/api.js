@@ -111,6 +111,7 @@ export async function boardManual(formData) {
         }
 
         const result = await response.json();
+        console.log(formData);
         console.log('저장 응답:', result);
 
         if (!result || typeof result !== 'object') {

@@ -53,13 +53,14 @@ function MenualPage() {
 
         const sendData = {
             manualScript: formData.script,
-            manualChecklist: formData.checklist,
+            manualCheckList: formData.checklist,
             manualEtc: formData.etc
         }
 
         try {
             setSaving(true);
-            await boardManual(sendData);   
+            await boardManual(sendData);
+            console.log(sendData);
             console.log('저장 성공');
             alert('저장되었습니다.');
             
