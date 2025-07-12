@@ -37,7 +37,14 @@ function AdminNoticeWritePage({ setPage, onNoticeAdded }) {
       setFile(null);
 
       if (onNoticeAdded) {
-        onNoticeAdded(result);
+        try {
+          console.log('onNoticeAdded 실행 전', result);
+          onNoticeAdded(result);
+          console.log('onNoticeAdded 실행 후', result);
+        } catch (e) {
+          console.error('onNoticeAdded 실행 중 에러 발생:', e);
+        }
+        
       }
 
       setPage("notice");
