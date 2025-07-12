@@ -69,12 +69,14 @@ export async function getUserAccount() {
         if (!result || typeof result !== 'object') {
             throw new Error("서버 응답이 올바르지 않습니다");
         }
-            
-        return Array.isArray(result) ? result.map(item => ({
+
+        return Array.isArray(result) ? result.map((item, idx) => ({
+            index: idx + 1,
+            guestName: item.memberName,
             userId: item.memberId,
             email: item.memberEmail,
             tel: item.memberPhone,
-            userRole: item.memberRole,
+            userRole: item.memberRole === 2 ? 'guest' : 'admin'
         })) : [];
     } catch (error) {
         if (error.name === 'TypeError' && error.message.includes('fetch')) {
