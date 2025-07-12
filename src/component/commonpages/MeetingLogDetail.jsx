@@ -17,33 +17,13 @@ const MeetingLogDetail = ({
 
   return (
     <div className="meeting-log-detail-form">
-      {/* 네비게이션 헤더 */}
-      <div className="detail-navigation">
-        <div className="nav-info">
-          {currentIndex} / {totalCount}
-        </div>
-        <div className="nav-buttons">
-          <button
-            onClick={onPrevious}
-            disabled={!hasPrevious}
-            className="nav-button"
-          >
-            이전
-          </button>
-          <button onClick={onNext} disabled={!hasNext} className="nav-button">
-            다음
-          </button>
-        </div>
-      </div>
-
-      <div className="detail-form-layout">
-        <div className="form-section">
+      <div className="form-section">
           <h2 className="section-title">회의 내용</h2>
           <table>
             <tbody>
               <tr>
                 <th>주제</th>
-                <td>{log.title}</td>
+                <td>{log.subject}</td>
               </tr>
               <tr>
                 <th>장소</th>
@@ -51,7 +31,18 @@ const MeetingLogDetail = ({
               </tr>
               <tr>
                 <th>일시</th>
-                <td>{log.date}</td>
+                <td>
+                  {new Date(log.date).toLocaleDateString("ko-KR", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })}{" "}
+                  (
+                  {new Date(log.date).toLocaleDateString("ko-KR", {
+                    weekday: "short",
+                  })}
+                  )
+                </td>
               </tr>
               <tr>
                 <th>작성자</th>
@@ -59,7 +50,7 @@ const MeetingLogDetail = ({
               </tr>
               <tr>
                 <th>참여자</th>
-                <td>{log.attendees}</td>
+                <td>{log.participants}</td>
               </tr>
               <tr>
                 <th>결석자</th>
@@ -73,6 +64,7 @@ const MeetingLogDetail = ({
           </table>
         </div>
 
+      <div className="right-panel">
         <div className="form-section">
           <h2 className="section-title">회의 요약</h2>
           <table>
@@ -89,7 +81,7 @@ const MeetingLogDetail = ({
           </table>
         </div>
 
-        <div className="form-section">
+        <div className="form-section follow-up-section">
           <h2 className="section-title">Follow-up</h2>
           <table>
             <thead>
@@ -101,12 +93,23 @@ const MeetingLogDetail = ({
               </tr>
             </thead>
             <tbody>
-              {log.followUps?.map((item, index) => (
+              {log.followUp?.map((item, index) => (
                 <tr key={index}>
                   <td>{index + 1}</td>
-                  <td>{item.task}</td>
-                  <td>{item.executor}</td>
-                  <td>{item.deadline}</td>
+                  <td>{item.job}</td>
+                  <td>{item.assignee}</td>
+                  <td>
+                    {new Date(item.dueDate).toLocaleDateString("ko-KR", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })}{" "}
+                    (
+                    {new Date(item.dueDate).toLocaleDateString("ko-KR", {
+                      weekday: "short",
+                    })}
+                    )
+                  </td>
                 </tr>
               ))}
             </tbody>
