@@ -40,9 +40,12 @@ function AdminAccountPage() {
         }
 
         try {
-            const result = await createUserAccount(sendData);
-
-            setUsers([...users, { index: users.length + 1, ...result }]);
+            await createUserAccount(sendData);
+            // 1. 계정 생성 후 서버의 전체 목록을 다시 불러오고
+            const updatedList = await getUserAccount();
+            // 2. 그걸로 users를 세팅!
+            setUsers(updatedList);
+            // 3. 폼 초기화
             setForm({
                 guestName: "",
                 userId: "",
