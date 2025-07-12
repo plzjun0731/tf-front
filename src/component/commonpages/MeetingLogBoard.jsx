@@ -3,15 +3,6 @@ import MeetingLogWriteForm from "./MeetingLogWriteForm";
 import MeetingLogDetail from "./MeetingLogDetail";
 import "../styles/MeetingLogBoard.css";
 
-const MeetingLogItem = ({ log, onView }) => (
-  <div className="meeting-log-item" onClick={() => onView(log.id)}>
-    <h3>{log.title}</h3>
-    <p>
-      작성자: {log.author} | 작성일: {log.date}
-    </p>
-  </div>
-);
-
 const MeetingLogBoard = () => {
   const [viewMode, setViewMode] = useState("list");
   const [meetingLogs, setMeetingLogs] = useState([]);
@@ -19,16 +10,34 @@ const MeetingLogBoard = () => {
   const [editingLog, setEditingLog] = useState(null);
   const [inputValue, setInputValue] = useState("");
   const [searchKeyword, setSearchKeyword] = useState("");
+  const [searchOption, setSearchOption] = useState("subject");
   const [filteredMeetingLogs, setFilteredMeetingLogs] = useState([]);
   const [currentLogIndex, setCurrentLogIndex] = useState(-1);
+  const itemsPerPage = 10; // 페이지당 항목 수
 
   useEffect(() => {
-    const result = meetingLogs.filter(
-      (log) =>
-        searchKeyword.trim() === "" || log.title.includes(searchKeyword.trim())
-    );
+    const trimmedKeyword = searchKeyword.trim();
+    const result = meetingLogs.filter((log) => {
+      if (trimmedKeyword === "") {
+        return true;
+      }
+      switch (searchOption) {
+        case "subject":
+          return log.subject && log.subject.includes(trimmedKeyword);
+        case "content":
+          return log.content && log.content.includes(trimmedKeyword);
+        case "author":
+          return log.author && log.author.includes(trimmedKeyword);
+        default:
+          return log.subject && log.subject.includes(trimmedKeyword);
+      }
+    });
     setFilteredMeetingLogs(result);
-  }, [meetingLogs, searchKeyword]);
+    setCurrentLogIndex(-1); // 검색 후 인덱스 초기화
+  }, [meetingLogs, searchKeyword, searchOption]);
+
+  // 페이지네이션 계산
+  const totalPages = Math.ceil(filteredMeetingLogs.length / itemsPerPage);
 
   const handleSearch = () => {
     setSearchKeyword(inputValue);
@@ -95,6 +104,29 @@ const MeetingLogBoard = () => {
     }
   };
 
+  // 페이지네이션 버튼 렌더링 함수 추가
+  const renderPaginationButtons = () => {
+    const buttons = [];
+    for (let i = 1; i <= totalPages; i++) {
+      buttons.push(
+        <button
+          key={i}
+          className={currentLogIndex === i - 1 ? "active" : ""}
+          onClick={() => {
+            setCurrentLogIndex(i - 1);
+            if (filteredMeetingLogs[i - 1]) {
+              const log = meetingLogs.find((l) => l.id === filteredMeetingLogs[i - 1].id);
+              setSelectedLog(log);
+            }
+          }}
+        >
+          {i}
+        </button>
+      );
+    }
+    return buttons;
+  };
+
   return (
     <div className="meeting-log-board">
       {viewMode === "list" && (
@@ -108,13 +140,18 @@ const MeetingLogBoard = () => {
                 setEditingLog(null);
               }}
             >
-              등록
+              글쓰기
             </button>
           </div>
 
           <div className="meeting-log-search">
-            <select disabled>
-              <option>제목</option>
+            <select
+              value={searchOption}
+              onChange={(e) => setSearchOption(e.target.value)}
+            >
+              <option value="subject" style={{color: "#1F2D3D"}}>제목</option>
+              <option value="content" style={{color: "#1F2D3D"}}>내용</option>
+              <option value="author" style={{color: "#1F2D3D"}}>작성자</option>
             </select>
             <input
               type="text"
@@ -134,15 +171,29 @@ const MeetingLogBoard = () => {
             {filteredMeetingLogs.length === 0 ? (
               <li className="empty">등록된 회의록이 없습니다.</li>
             ) : (
-              filteredMeetingLogs.map((log) => (
-                <li
-                  key={log.id}
-                  onClick={() => handleViewLog(log.id)}
-                  className="meeting-log-list-item"
-                >
-                  {log.title}
-                </li>
-              ))
+              [...filteredMeetingLogs]
+                .sort((a, b) => new Date(b.date) - new Date(a.date))
+                .map((log) => (
+                  <li
+                    key={log.id}
+                    onClick={() => handleViewLog(log.id)}
+                    className="meeting-log-list-item"
+                  >
+                    <span className="log-subject">{log.subject}</span>
+                    <span className="log-date">
+                      {new Date(log.date).toLocaleDateString("ko-KR", {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      })}{" "}
+                      (
+                      {new Date(log.date).toLocaleDateString("ko-KR", {
+                        weekday: "short",
+                      })}
+                      )
+                    </span>
+                  </li>
+                ))
             )}
           </ul>
         </div>
@@ -160,22 +211,42 @@ const MeetingLogBoard = () => {
       )}
 
       {viewMode === "view" && selectedLog && (
-        <MeetingLogDetail
-          log={selectedLog}
-          onBack={() => {
-            setViewMode("list");
-            setSelectedLog(null);
-            setCurrentLogIndex(-1);
-          }}
-          onDelete={handleDeleteLog}
-          onEdit={handleEditLog}
-          onPrevious={handlePreviousLog}
-          onNext={handleNextLog}
-          hasPrevious={currentLogIndex > 0}
-          hasNext={currentLogIndex < filteredMeetingLogs.length - 1}
-          currentIndex={currentLogIndex + 1}
-          totalCount={filteredMeetingLogs.length}
-        />
+        <>
+          <MeetingLogDetail
+            log={selectedLog}
+            onBack={() => {
+              setViewMode("list");
+              setSelectedLog(null);
+              setCurrentLogIndex(-1);
+            }}
+            onDelete={handleDeleteLog}
+            onEdit={handleEditLog}
+            onPrevious={handlePreviousLog}
+            onNext={handleNextLog}
+            hasPrevious={currentLogIndex > 0}
+            hasNext={currentLogIndex < filteredMeetingLogs.length - 1}
+            currentIndex={currentLogIndex + 1}
+            totalCount={filteredMeetingLogs.length}
+          />
+          {/* 동적 페이지네이션 */}
+          {totalPages > 1 && (
+            <div className="pagination">
+              <button 
+                onClick={handlePreviousLog}
+                disabled={currentLogIndex === 1}
+              >
+                «
+              </button>
+              {renderPaginationButtons()}
+              <button 
+                onClick={handleNextLog}
+                disabled={currentLogIndex === totalPages}
+              >
+                »
+              </button>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
