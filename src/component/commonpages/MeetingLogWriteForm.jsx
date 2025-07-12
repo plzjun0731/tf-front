@@ -6,7 +6,8 @@ const MeetingLogWriteForm = ({ onSave, onCancel, initialData }) => {
     initialData || {
       subject: "",
       location: "",
-      date: "",
+      startDate: "",
+      endDate: "",
       author: "",
       participants: "",
       absentees: "",
@@ -17,6 +18,7 @@ const MeetingLogWriteForm = ({ onSave, onCancel, initialData }) => {
     }
   );
   const [showDateWarning, setShowDateWarning] = useState(false); // 일시 경고 상태
+  const [showEndDateBeforeStartDateWarning, setShowEndDateBeforeStartDateWarning] = useState(false); // 종료 일시가 시작 일시보다 빠를 때 경고 상태
   const [followUpDateWarnings, setFollowUpDateWarnings] = useState(
     formData.followUp.map(() => false)
   ); // Follow-up 마감일 경고 상태
@@ -30,8 +32,9 @@ const MeetingLogWriteForm = ({ onSave, onCancel, initialData }) => {
 
   const handleChange = (field, value) => {
     setFormData({ ...formData, [field]: value });
-    if (field === "date" && value) {
+    if ((field === "startDate" || field === "endDate") && value) {
       setShowDateWarning(false); // 날짜가 입력되면 경고 숨김
+      setShowEndDateBeforeStartDateWarning(false); // 종료 일시 경고 숨김
     }
     if (field === "subject" && value) setShowSubjectWarning(false);
     if (field === "location" && value) setShowLocationWarning(false);
@@ -79,11 +82,19 @@ const MeetingLogWriteForm = ({ onSave, onCancel, initialData }) => {
     const newFollowUpDateWarnings = [...followUpDateWarnings];
 
     // 일시 유효성 검사
-    if (!formData.date || isNaN(new Date(formData.date).getTime())) {
+    if (!formData.startDate || isNaN(new Date(formData.startDate).getTime())) {
       setShowDateWarning(true);
       hasError = true;
     } else {
       setShowDateWarning(false);
+    }
+
+    // 종료 일시가 시작 일시보다 빠른 경우 경고
+    if (formData.startDate && formData.endDate && new Date(formData.endDate) < new Date(formData.startDate)) {
+      setShowEndDateBeforeStartDateWarning(true);
+      hasError = true;
+    } else {
+      setShowEndDateBeforeStartDateWarning(false);
     }
 
     // 개별 필드 유효성 검사
@@ -126,15 +137,20 @@ const MeetingLogWriteForm = ({ onSave, onCancel, initialData }) => {
       setFormData({
         subject: "",
         location: "",
-        date: ""
+        startDate: "",
+        endDate: ""
       })
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="meeting-log-form">
-      {/* 회의 내용 섹션 */}
-      <div className="form-section">
+    <div className="meeting-log-write-container">
+      <div className="meeting-log-header">
+        <h2>{initialData ? "회의록 수정" : "새 회의록 작성"}</h2>
+      </div>
+      <form onSubmit={handleSubmit} className="meeting-log-form">
+        {/* 회의 내용 섹션 */}
+      <div className="form-section" style={{ gridArea: 'content' }}>
         <h2 className="section-title">회의 내용</h2>
         <table>
           <tbody>
@@ -169,16 +185,31 @@ const MeetingLogWriteForm = ({ onSave, onCancel, initialData }) => {
               </td>
             </tr>
             <tr>
-              <td>일시</td>
+              <td>시작 일시</td>
               <td>
                 <input
-                  type="date"
-                  value={formData.date}
-                  onChange={(e) => handleChange("date", e.target.value)}
+                  type="datetime-local"
+                  value={formData.startDate}
+                  onChange={(e) => handleChange("startDate", e.target.value)}
                 />
                 {showDateWarning && (
                   <p style={{ color: 'red', fontSize: '0.8em', marginTop: '5px' }}>
-                    일시를 입력해주세요.
+                    시작 일시를 입력해주세요.
+                  </p>
+                )}
+              </td>
+            </tr>
+            <tr>
+              <td>종료 일시</td>
+              <td>
+                <input
+                  type="datetime-local"
+                  value={formData.endDate}
+                  onChange={(e) => handleChange("endDate", e.target.value)}
+                />
+                {showEndDateBeforeStartDateWarning && (
+                  <p style={{ color: 'red', fontSize: '0.8em', marginTop: '5px' }}>
+                    종료 일시는 시작 일시보다 빠를 수 없습니다.
                   </p>
                 )}
               </td>
@@ -244,7 +275,7 @@ const MeetingLogWriteForm = ({ onSave, onCancel, initialData }) => {
       </div>
 
       {/* 오른쪽 패널 (회의 요약 + Follow-up) */}
-      <div className="right-panel">
+      <div className="right-panel" style={{ gridArea: 'right-panel' }}>
         {/* 회의 요약 섹션 */}
         <div className="form-section">
           <h2 className="section-title">회의 요약</h2>
@@ -302,8 +333,7 @@ const MeetingLogWriteForm = ({ onSave, onCancel, initialData }) => {
                 <tr key={index}>
                   <td>{index + 1}</td>
                   <td>
-                    <input
-                      type="text"
+                    <textarea
                       value={item.job}
                       onChange={(e) =>
                         handleFollowUpChange(index, "job", e.target.value)
@@ -364,6 +394,7 @@ const MeetingLogWriteForm = ({ onSave, onCancel, initialData }) => {
         </button>
       </div>
     </form>
+  </div>
   );
 };
 
