@@ -154,12 +154,14 @@ export async function getBoardManual() {
         if (!result || typeof result !== 'object') {
             throw new Error("서버 응답이 올바르지 않습니다");
         }
+
+        const manual = result.manual || {};
         
         return {
-            manualScript: result.manual_script || '',
-            manualChecklist: result.manual_checklist || '',
-            manualEtc: result.manual_etc || '',
-            ...result 
+            manualScript: manual.manualScript || '',
+            manualChecklist: manual.manualCheckList || '',
+            manualEtc: manual.manualEtc || '',
+            ...manual
         };
         
     } catch (error) {
