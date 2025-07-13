@@ -39,7 +39,7 @@ export async function getPartnerList() {
             notice1: item.noticeDate1,
             notice2: item.noticeDate2,
             notice3: item.noticeDate3,
-            goalPerformance: item.TargetValue,
+            goalPerformance: item.targetValue,
             lastUpdated: item.lastUpdated,
             notice1Img: item.noticeImg1 ? { url: item.noticeImg1 } : null,
             notice2Img: item.noticeImg2 ? { url: item.noticeImg2 } : null,
@@ -83,7 +83,7 @@ export async function updatePartnerInfo(partnerData, images = {}) {
             noticeDate1: partnerData.noticeDate1 || '',
             noticeDate2: partnerData.noticeDate2 || '',
             noticeDate3: partnerData.noticeDate3 || '',
-            TargetValue: partnerData.TargetValue || '',
+            targetValue: partnerData.targetValue || '',
             lastUpdated: new Date().toISOString()
         };
 

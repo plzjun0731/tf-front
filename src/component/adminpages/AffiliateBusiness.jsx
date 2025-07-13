@@ -62,7 +62,7 @@ function AffiliateBusiness() {
             noticeDate1: formData.notice1,
             noticeDate2: formData.notice2,
             noticeDate3: formData.notice3,
-            TargetValue: formData.goalPerformance
+            targetValue: formData.goalPerformance
         }
 
         try {
@@ -132,6 +132,7 @@ function AffiliateBusiness() {
     };
 
     const saveChanges = async (rowId) => {
+        console.log('saveChanges 호출됨:', { rowId, selectedCell });
         const { field } = selectedCell || {};
 
         if (field) {
@@ -141,7 +142,7 @@ function AffiliateBusiness() {
                     alert('데이터를 찾을 수 없습니다.');
                     return;
                 }
-
+                console.log('현재 행 데이터:', currentRow);
                 const tempData = tempRowData[rowId] || {};
                 
                 const partnerData = {
@@ -152,7 +153,7 @@ function AffiliateBusiness() {
                     noticeDate1: tempData.notice1 !== undefined ? tempData.notice1 : currentRow.notice1,
                     noticeDate2: tempData.notice2 !== undefined ? tempData.notice2 : currentRow.notice2,
                     noticeDate3: tempData.notice3 !== undefined ? tempData.notice3 : currentRow.notice3,
-                    TargetValue: tempData.goalPerformance !== undefined ? tempData.goalPerformance : currentRow.goalPerformance,
+                    targetValue: tempData.goalPerformance !== undefined ? tempData.goalPerformance : currentRow.goalPerformance,
                 };
 
                 if (field === 'affiliateName') {
@@ -162,7 +163,7 @@ function AffiliateBusiness() {
                 } else if (field === 'manager') {
                     partnerData.partnerManager = cellValue;
                 } else if (field === 'goalPerformance') {
-                    partnerData.TargetValue = cellValue;
+                    partnerData.targetValue = cellValue;
                 } else if (field === 'notice1') {
                     partnerData.noticeDate1 = cellValue;
                 } else if (field === 'notice2') {
@@ -179,6 +180,15 @@ function AffiliateBusiness() {
 
                 const updatedList = await getPartnerList();
                 setData(updatedList);
+                setTempRowData(prev => {
+                    const updated = { ...prev };
+                    delete updated[rowId];
+                    return updated;
+                });
+
+                setSelectedCell(null);
+                setCellValue('');
+
                 alert('저장되었습니다.');
 
             } catch (error) {
@@ -186,16 +196,7 @@ function AffiliateBusiness() {
                 console.error(error);
                 return; 
             }
-        }
-        // cleanup
-        setTempRowData(prev => {
-            const updated = { ...prev };
-            delete updated[rowId];
-            return updated;
-        });
-
-        setSelectedCell(null);
-        setCellValue('');
+        }        
     };
 
     const handleCellSave = () => {
@@ -321,7 +322,12 @@ function AffiliateBusiness() {
                         value={cellValue || ''}
                         onChange={(e) => setCellValue(e.target.value)}
                         autoFocus
-                        onKeyDown={(e) => e.key === 'Enter' && saveChanges(row.id)}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                                e.preventDefault();
+                                saveChanges(row.id);
+                            } 
+                        }}
                         style={{ width: isNumberField(field) ? "80px" : "auto" }}
                     />
                     <button 
@@ -538,27 +544,28 @@ function AffiliateBusiness() {
                                 <td>{renderCell(row, "goalPerformance")}</td>
                                 <td>{row.lastUpdated || getCurrentDate()}</td>
                                 <td>
-                                    <span 
+                                    <button 
+                                        className="button"
                                         onClick={() => saveChanges(row.id)}
                                         style={{ 
+                                            padding: "6px 11px",
                                             cursor: "pointer", 
-                                            textDecoration: "underline",
-                                            marginRight: "10px"
                                         }}
                                     >
                                         저장
-                                    </span>
+                                    </button>
                                 </td>
                                 <td>
-                                    <span 
+                                    <button
+                                        className="button"
                                         onClick={() => deleteRow(row.id)}
                                         style={{ 
+                                            padding: "6px 11px",
                                             cursor: "pointer", 
-                                            textDecoration: "underline"
                                         }}
                                     >
                                         삭제
-                                    </span>
+                                    </button>
                                 </td>
                             </tr>
                         )))}
