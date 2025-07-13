@@ -102,32 +102,44 @@ export async function updatePartnerInfo(partnerData, images = {}) {
 
         return await response.json();
     } catch (error) {
-        console.error('업데이트 Api 에러:', error);
+        console.error('업데이트 API 에러:', error);
         throw error;
     }
 }
 
-export async function updateMonthlyPerformance(partnerId, year, month, field, value) {
-    const response = await fetch(`${API_BASE_URL}/api/updatePartner`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({
-            partnerId,
-            year,
-            month,
-            field,
-            value: parseInt(value) || 0
-        }),
-    });
+// export async function updateMonthlyPerformance(partnerId, year, month, field, value) {
+//     const response = await fetch(`${API_BASE_URL}/api/updatePartner`, {
+//         method: "PUT",
+//         headers: { "Content-Type": "application/json" },
+//         credentials: "include",
+//         body: JSON.stringify({
+//             partnerId,
+//             year,
+//             month,
+//             field,
+//             value: parseInt(value) || 0
+//         }),
+//     });
 
-    if (!response.ok) throw new Error("월별 실적 업데이트 실패");
-    return await response.json();
-}
+//     if (!response.ok) throw new Error("월별 실적 업데이트 실패");
+//     return await response.json();
+// }
 
 export async function deletePartnerInfo(partnerId) {
-    const response = await fetch(`${API_BASE_URL}/api/deletePartnerList/${partnerId}`, {
-        method: "DELETE",
-        
-    });
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/deletePartner/${partnerId}`, {
+            method: "DELETE",
+            credentials: "include",
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || `HTTP ${response.status}: 삭제 실패`);
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error('삭제 API 에러:', error);
+        throw error;
+    }    
 }

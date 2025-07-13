@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { ImagePlus, PencilLine, X, Check, ImageOff } from "lucide-react";
-import { insertPartnerInfo, getPartnerList, updatePartnerInfo } from "../../services/AffiliateBusinessApi";
+import { insertPartnerInfo, getPartnerList, updatePartnerInfo, deletePartnerInfo } from "../../services/AffiliateBusinessApi";
 import "../styles/AffiliateBusiness.css";
 
 function AffiliateBusiness() {
@@ -172,7 +172,7 @@ function AffiliateBusiness() {
                 alert('저장되었습니다.');
 
             } catch (error) {
-                alert('저장에 실패했습니다.');
+                alert('저장에 실패했습니다. 다시 시도해 주세요.');
                 console.error(error);
                 return; 
             }
@@ -208,17 +208,35 @@ function AffiliateBusiness() {
         setCellValue('');
     }
 
-    const deleteRow = (rowId) => {
+    const deleteRow = async (rowId) => {
         if (window.confirm("정말로 삭제하시겠습니까?")) {
-            setData(data.filter(row => row.id !== rowId));
-            setTempRowData(prev => {
-                const newData = { ...prev };
-                delete newData[rowId];
-                return newData;
-            });
-            if (selectedCell && selectedCell.rowId === rowId) {
-                setSelectedCell(null);
-                setCellValue('');
+            try {
+                await deletePartnerInfo(rowId);
+
+                const updatedList = await getPartnerList();
+                setData(updatedList);
+
+                setTempRowData(prev => {
+                    const newData = { ...prev };
+                    delete newData[rowId];
+                    return newData;
+                });
+
+                setImageFiles(prev => {
+                    const newData = { ...prev };
+                    delete newData[rowId];
+                    return newData;
+                });
+
+                if (selectedCell && selectedCell.rowId === rowId) {
+                    setSelectedCell(null);
+                    setCellValue('');
+                }
+
+                alert('삭제되었습니다.');
+            } catch (error) {
+                alert('삭제에 실패했습니다. 다시 시도해 주세요.');
+                console.error(error);
             }
         }
     };
