@@ -45,8 +45,26 @@ export async function getMeetingLogList(){
 
 export async function writeMeetingLog(formData) {
     try {
-        console.log('매뉴얼 저장 요청:', formData);
-        const response = await fetch(`${API_BASE_URL}/api/writeMinutes`, {
+        console.log('회의록 저장 요청:', formData);
+        
+        const sendData = {
+            minutesTitle: formData.subject,
+            minutesPlace: formData.location,
+            // minutesWorkdate: formData.date,
+            minutesWriter: formData.author,
+            minutesJoiner: formData.participants,
+            minutesAbsentee: formData.absentees,
+            minutesContent: formData.content,
+            minutesResult: formData.conclusion,
+            minutesNext: formData.nextStep,
+
+            boardFollowUp: formData.followUp.map(item => ({
+                followUpWork: item.job,
+                followUpPerformer: item.assignee,
+                followUpDeadline: item.dueDate
+            }))
+        }
+        const response = await fetch(`${API_BASE_URL}/api/writeMeetingLog`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             credentials: "include",
