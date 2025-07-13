@@ -15,6 +15,8 @@ function AffiliateBusiness() {
         notice3: '',
         goalPerformance: '' 
     });
+    const [imageFiles, setImageFiles] = useState({});
+    
     const [selectedCell, setSelectedCell] = useState(null);
     const [cellValue, setCellValue] = useState('');
     const [tempRowData, setTempRowData] = useState({});
@@ -134,7 +136,36 @@ function AffiliateBusiness() {
 
         if (field) {
             try {
-                const updatedData = await updatePartnerInfo(rowId, field, cellValue);
+                const currentRow = data.find(row => row.id === rowId);
+                if (!currentRow) {
+                    alert('데이터를 찾을 수 없습니다.');
+                    return;
+                }
+
+                const tempData = tempRowData[rowId] || {};
+
+                const partnerData = {
+                    partnerId: currentRow.id,
+                    partnerName: tempData.affiliateName !== undefined ? tempData.affiliateName : currentRow.affiliateName,
+                    partnerUnit: tempData.unit !== undefined ? tempData.unit : currentRow.unit,
+                    partnerManager: tempData.manager !== undefined ? tempData.manager : currentRow.manager,
+                    noticeDate1: tempData.notice1 !== undefined ? tempData.notice1 : currentRow.notice1,
+                    noticeDate2: tempData.notice2 !== undefined ? tempData.notice2 : currentRow.notice2,
+                    noticeDate3: tempData.notice3 !== undefined ? tempData.notice3 : currentRow.notice3,
+                    partnerTargetValue: tempData.goalPerformance !== undefined ? tempData.goalPerformance : currentRow.goalPerformance,
+                    
+                    [   
+                        field === 'affiliateName' ? 'partnerName' :
+                        field === 'unit' ? 'partnerUnit' :
+                        field === 'manager' ? 'partnerManager' :
+                        field === 'goalPerformance' ? 'partnerTargetValue' :
+                        field
+                    ]: cellValue
+                };
+
+                const images = imageFiles[rowId] || {};
+
+                const updatedData = await updatePartnerInfo(partnerData, images);
                 const updatedList = await getPartnerList();
 
                 setData(updatedList);
@@ -196,41 +227,58 @@ function AffiliateBusiness() {
         if (files && files.length > 0) {
             const file = files[0];
             const reader = new FileReader();
+
             reader.onload = (e) => {
                 const newImage = {
                     url: e.target.result,
                     name: file.name
                 };
 
-                const currentDate = getCurrentDate();
-
                 setData(prev =>
                     prev.map(row =>
                         row.id === rowId
-                            ? { ...row, [field]: newImage, lastUpdated: currentDate }
+                            ? { ...row, [field]: newImage, lastUpdated: getCurrentDate() }
                             : row
                     )
                 );
+                reader.readAsDataURL(file);
+
+                setImageFiles(prev => ({
+                    ...prev,
+                    [rowId]: {
+                        ...prev[rowId],
+                        [field]: file 
+                    }
+                }));
             };
-            reader.readAsDataURL(file);
         }
     };
 
     const handleImageDelete = (rowId, field) => {
         if (window.confirm("정말로 삭제하시겠습니까?")) {
-            const currentDate = getCurrentDate();
             setData(prev =>
                 prev.map(row =>
                     row.id === rowId
-                        ? { ...row, [field]: null, lastUpdated: currentDate }
+                        ? { ...row, [field]: null, lastUpdated: getCurrentDate() }
                         : row
                 )
             );
+
+            setImageFiles(prev => {
+                const updated = { ...prev };
+                if (updated[rowId]) {
+                    delete updated[rowId][field];
+                    if (Object.keys(updated[rowId]).length === 0) {
+                        delete updated[rowId];
+                    }
+                }
+                return updated;
+            })
         }
     };
 
     const isDateField = (field) => ['notice1', 'notice2', 'notice3'].includes(field);
-    const isImageField = (field) => ['notice1Image', 'notice2Image', 'notice3Image'].includes(field);
+    const isImageField = (field) => ['notice1Img', 'notice2Img', 'notice3Img'].includes(field);
     const isNumberField = (field) => {
         return field.includes('_db') || field.includes('_exam') || field.includes('_surgery') || field === 'goalPerformance';
     }
@@ -280,7 +328,7 @@ function AffiliateBusiness() {
         }
 
         if (isDateField(field)) {
-            const imageField = field + "Image";
+            const imageField = field + "Img";
             const imageObj = row[imageField];
 
             return (

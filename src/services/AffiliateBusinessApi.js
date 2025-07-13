@@ -68,17 +68,28 @@ export async function insertPartnerInfo(formData) {
     return await response.json();
 }
 
-export async function updatePartnerInfo(partnerId, field, value) {
+export async function updatePartnerInfo(partnerData, images = {}) {
     try {
-        const response = await fetch(`${API_BASE_URL}/api/updatePartner/${partnerId}`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
+        const formData = new FormData();
+
+        formData.append("partnerId", partnerData.partnerId);
+        formData.append("partnerName", partnerData.partnerName || '');
+        formData.append("partnerUnit", partnerData.partnerUnit || '');
+        formData.append("partnerManager", partnerData.partnerManager || '');
+        formData.append("noticeDate1", partnerData.noticeData1 || '');
+        formData.append("noticeDate2", partnerData.noticeData2 || '');
+        formData.append("noticeDate3", partnerData.noticeData3 || '');
+        formData.append("partnerTargetValue", partnerData.partnerTargetValue || '');
+        formData.append("lastUpdated", new Date().toISOString());
+
+        if (images.noticeImg1) formData.append("noticeImg1", images.noticeImg1);
+        if (images.noticeImg2) formData.append("noticeImg2", images.noticeImg2);
+        if (images.noticeImg3) formData.append("noticeImg3", images.noticeImg3);
+
+        const response = await fetch('${API_BASE_URL}/api/updatePartner', {
+            method: "POST",
             credentials: "include",
-            body: JSON.stringify({ 
-                field, 
-                value,
-                lastUpdated: new Date().toISOString()
-            }),
+            body: formData,
         });
 
         if (!response.ok) {
