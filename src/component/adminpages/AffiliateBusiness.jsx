@@ -135,68 +135,73 @@ function AffiliateBusiness() {
         console.log('saveChanges 호출됨:', { rowId, selectedCell });
         const { field } = selectedCell || {};
 
-        if (field) {
-            try {
-                const currentRow = data.find(row => row.id === rowId);
-                if (!currentRow) {
-                    alert('데이터를 찾을 수 없습니다.');
-                    return;
-                }
-                console.log('현재 행 데이터:', currentRow);
-                const tempData = tempRowData[rowId] || {};
-                
-                const partnerData = {
-                    partnerId: currentRow.id,
-                    partnerName: tempData.affiliateName !== undefined ? tempData.affiliateName : currentRow.affiliateName,
-                    partnerUnit: tempData.unit !== undefined ? tempData.unit : currentRow.unit,
-                    partnerManager: tempData.manager !== undefined ? tempData.manager : currentRow.manager,
-                    noticeDate1: tempData.notice1 !== undefined ? tempData.notice1 : currentRow.notice1,
-                    noticeDate2: tempData.notice2 !== undefined ? tempData.notice2 : currentRow.notice2,
-                    noticeDate3: tempData.notice3 !== undefined ? tempData.notice3 : currentRow.notice3,
-                    targetValue: tempData.goalPerformance !== undefined ? tempData.goalPerformance : currentRow.goalPerformance,
-                };
+        if (!field) { 
+            console.log('편집 중인 필드가 없음');
+            return;
+        }
 
-                if (field === 'affiliateName') {
-                    partnerData.partnerName = cellValue;
-                } else if (field === 'unit') {
-                    partnerData.partnerUnit = cellValue;
-                } else if (field === 'manager') {
-                    partnerData.partnerManager = cellValue;
-                } else if (field === 'goalPerformance') {
-                    partnerData.targetValue = cellValue;
-                } else if (field === 'notice1') {
-                    partnerData.noticeDate1 = cellValue;
-                } else if (field === 'notice2') {
-                    partnerData.noticeDate2 = cellValue;
-                } else if (field === 'notice3') {
-                    partnerData.noticeDate3 = cellValue;
-                }
-
-                const images = imageFiles[rowId] || {};
-                console.log('전송할 데이터:', partnerData);
-                console.log('전송할 이미지:', images);
-
-                await updatePartnerInfo(partnerData, images);
-
-                const updatedList = await getPartnerList();
-                setData(updatedList);
-                setTempRowData(prev => {
-                    const updated = { ...prev };
-                    delete updated[rowId];
-                    return updated;
-                });
-
-                setSelectedCell(null);
-                setCellValue('');
-
-                alert('저장되었습니다.');
-
-            } catch (error) {
-                alert('저장에 실패했습니다. 다시 시도해 주세요.');
-                console.error(error);
-                return; 
+        try {
+            const currentRow = data.find(row => row.id === rowId);
+            if (!currentRow) {
+                alert('데이터를 찾을 수 없습니다.');
+                return;
             }
-        }        
+            console.log('현재 행 데이터:', currentRow);
+            console.log('수정한 값:', cellValue);
+
+            const tempData = tempRowData[rowId] || {};
+                
+            const partnerData = {
+                partnerId: currentRow.id,
+                partnerName: tempData.affiliateName !== undefined ? tempData.affiliateName : currentRow.affiliateName,
+                partnerUnit: tempData.unit !== undefined ? tempData.unit : currentRow.unit,
+                partnerManager: tempData.manager !== undefined ? tempData.manager : currentRow.manager,
+                noticeDate1: tempData.notice1 !== undefined ? tempData.notice1 : currentRow.notice1,
+                noticeDate2: tempData.notice2 !== undefined ? tempData.notice2 : currentRow.notice2,
+                noticeDate3: tempData.notice3 !== undefined ? tempData.notice3 : currentRow.notice3,
+                targetValue: tempData.goalPerformance !== undefined ? tempData.goalPerformance : currentRow.goalPerformance,
+            };
+
+            if (field === 'affiliateName') {
+                partnerData.partnerName = cellValue;
+            } else if (field === 'unit') {
+                partnerData.partnerUnit = cellValue;
+            } else if (field === 'manager') {
+                partnerData.partnerManager = cellValue;
+            } else if (field === 'goalPerformance') {
+                partnerData.targetValue = cellValue;
+            } else if (field === 'notice1') {
+                partnerData.noticeDate1 = cellValue;
+            } else if (field === 'notice2') {
+                partnerData.noticeDate2 = cellValue;
+            } else if (field === 'notice3') {
+                partnerData.noticeDate3 = cellValue;
+            }
+
+            const images = imageFiles[rowId] || {};
+            console.log('전송할 데이터:', partnerData);
+            console.log('전송할 이미지:', images);
+
+            await updatePartnerInfo(partnerData, images);
+
+            const updatedList = await getPartnerList();
+            setData(updatedList);
+            setTempRowData(prev => {
+                const updated = { ...prev };
+                delete updated[rowId];
+                return updated;
+            });
+
+            setSelectedCell(null);
+            setCellValue('');
+
+            alert('저장되었습니다.');
+
+        } catch (error) {
+            alert('저장에 실패했습니다. 다시 시도해 주세요.');
+            console.error(error);
+        }
+               
     };
 
     const handleCellSave = () => {
