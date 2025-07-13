@@ -31,7 +31,7 @@ export async function getPartnerList() {
 
         const partnerList = result.partnerList || [];
 
-        return Array.isArray(partnerList) ? result.map((item, idx) => ({
+        return Array.isArray(partnerList) ? partnerList.map((item, idx) => ({
             id: item.partnerId,
             affiliateName: item.partnerName,
             unit: item.partnerUnit,
@@ -96,4 +96,11 @@ export async function updateMonthlyPerformance(partnerId, year, month, field, va
 
     if (!response.ok) throw new Error("월별 실적 업데이트 실패");
     return await response.json();
+}
+
+export async function deletePartnerInfo(partnerId) {
+    const response = await fetch(`${API_BASE_URL}/api/deletePartnerList/${partnerId}`, {
+        method: "DELETE",
+        
+    });
 }
