@@ -1,7 +1,25 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { getNoticeDetail } from "../../services/NoticeApi";
 import "../styles/AdminNotice.css";
 
-function AdminNoticeDetailPage({ notice, setPage }) {
+function AdminNoticeDetailPage({ noticeId, setPage }) {
+  const [notice, setNotice] = useState(null);
+  
+  useEffect(() => {
+    const fetchNotice = async () => {
+      try {
+        const noticeData = await getNoticeDetail(noticeId);
+        setNotice(noticeData);
+      } catch (err) {
+        console.error('공지사항 상세 로드 실패:', err)
+      } 
+    };
+
+    if (noticeId) {
+      fetchNotice();
+    }
+  }, [noticeId]);
+
   if (!notice) return <div>공지사항을 찾을 수 없습니다.</div>;
 
   return (

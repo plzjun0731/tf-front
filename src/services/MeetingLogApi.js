@@ -32,7 +32,9 @@ export async function getMeetingLogList(){
         return result.map(item => ({
             id: item.id,
             subject: item.minutesTitle,
-            date: item.minutesDate
+            date: item.minutesDate,
+            content: item.minutesContent,
+            author: item.minutesWriter,
         }));
 
     } catch(error){
@@ -137,7 +139,7 @@ export async function getMeetingLogDetail(minutesId){
             id: result.id,
             subject: result.minutesTitle,
             location: result.minutesPlace,
-            date: result.minutesDate,
+            //date: result.minutesDate,
             author: result.minutesWriter,
             participants: result.minutesJoiner,
             absentees: result.minutesAbsentee,

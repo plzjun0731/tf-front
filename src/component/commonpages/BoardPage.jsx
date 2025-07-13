@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import MenualPage from "./MenualPage";
-// import MeetingLogBoard from "./MeetingLogBoard";
-import MeetingLogWriteForm from "./MeetingLogWriteForm";
+import MeetingLogBoard from "./MeetingLogBoard";
 import AdminNoticeListPage from "./AdminNoticeListPage";
 import AdminNoticeDetailPage from "./AdminNoticeDetailPage";
 import AdminNoticeWritePage from "./AdminNoticeWritePage";
@@ -29,7 +28,7 @@ function BoardPage() {
             case 'menual':
                 return <MenualPage />;
             case 'minutes':
-                return <MeetingLogWriteForm />;
+                return <MeetingLogBoard />;
             case 'notice':
                 return renderNoticeContent();
             default:

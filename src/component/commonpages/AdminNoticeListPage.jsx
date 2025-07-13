@@ -11,26 +11,6 @@ function AdminNoticeListPage({ setPage, setSelectedNotice }) {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-  // const getNotices = () => {
-  //   try {
-  //     const notices = localStorage.getItem("notices");
-  //     return notices ? JSON.parse(notices) : [];
-  //   } catch (error) {
-  //     console.error("공지사항 로드 실패:", error);
-  //     return [];
-  //   }
-  // };
-
-  // const saveNotices = (noticeList) => {
-  //   try {
-  //     localStorage.setItem("notices", JSON.stringify(noticeList));
-  //     return true;
-  //   } catch (error) {
-  //     console.error("공지사항 저장 실패:", error);
-  //     return false;
-  //   }
-  // };
-
   // 컴포넌트 마운트 시 데이터 로드
   useEffect(() => {
     const fetchNotices = async () => {
@@ -44,35 +24,6 @@ function AdminNoticeListPage({ setPage, setSelectedNotice }) {
     }
     fetchNotices();
   }, []);
-
-  // const loadNotices = () => {
-  //   const savedNotices = getNotices();
-  //   if (savedNotices.length === 0) {
-  //     // localStorage가 비어있으면 초기 더미 데이터 추가
-  //     const dummyNotices = [
-  //       {
-  //         id: 1,
-  //         title: "시스템 점검 안내",
-  //         content: "시스템 점검으로 인한 서비스 중단 안내입니다.",
-  //         date: "2024-01-15",
-  //         author: "관리자",
-  //         file: null,
-  //       },
-  //       {
-  //         id: 2,
-  //         title: "새로운 기능 업데이트",
-  //         content: "새로운 기능이 추가되었습니다.",
-  //         date: "2024-01-10",
-  //         author: "관리자",
-  //         file: "update_guide.pdf",
-  //       },
-  //     ];
-  //     saveNotices(dummyNotices);
-  //     setNotices(dummyNotices);
-  //   } else {
-  //     setNotices(savedNotices);
-  //   }
-  // };
 
   useEffect(() => {
     const result = notices.filter((n) => {
@@ -124,7 +75,7 @@ function AdminNoticeListPage({ setPage, setSelectedNotice }) {
   };
 
   const handleNoticeClick = (notice) => {
-    setSelectedNotice(notice);
+    setSelectedNotice(notice.id);
     setPage("detail");
   };
 
@@ -169,7 +120,6 @@ function AdminNoticeListPage({ setPage, setSelectedNotice }) {
           onChange={(e) => setSearchType(e.target.value)}
         >
           <option value="title">제목</option>
-          <option value="content">내용</option>
           <option value="author">작성자</option>
         </select>
         <input

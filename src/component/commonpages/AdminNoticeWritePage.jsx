@@ -19,16 +19,22 @@ function AdminNoticeWritePage({ setPage, onNoticeAdded }) {
     try {
       setLoading(true);
 
-      const noticeData = {
-        noticeTitle: title.trim(),
-        noticeContent: content.trim(),
-        noticeFile: file ? file.name : null,
-      };
+      const formData = new FormData();
+      formData.append('noticeTitle', title.trim());
+      formData.append('noticeContent', content.trim());
 
-      console.log('전송할 데이터:', noticeData);
+      if (file) {
+        formData.append('noticeFile', file);
+      }
 
-      const result = await writeNotice(noticeData);
-      console.log('저장 성공:', result);
+      console.log('전송할 데이터:', {
+        title: title.trim(),
+        content: content.trim(),
+        file: file ? file.name : null
+      });
+
+      const result = await writeNotice(formData);
+      console.log('등록 성공:', result)
 
       alert("공지사항이 등록되었습니다.");
 
