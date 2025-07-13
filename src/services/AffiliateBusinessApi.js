@@ -29,14 +29,16 @@ export async function getPartnerList() {
             throw new Error("서버 응답이 올바르지 않습니다");
         }
 
-        return Array.isArray(result) ? result.map((item, idx) => ({
+        const partnerList = result.partnerList || [];
+
+        return Array.isArray(partnerList) ? result.map((item, idx) => ({
             id: item.partnerId,
             affiliateName: item.partnerName,
             unit: item.partnerUnit,
             manager: item.partnerManager,
-            notice1: item.partnerNoticeDate1,
-            notice2: item.partnerNoticeDate2,
-            notice3: item.partnerNoticeDate3,
+            notice1: item.noticeDate1,
+            notice2: item.noticeDate2,
+            notice3: item.noticeDate3,
             goalPerformance: item.partnerTargetValue,
             lastUpdated: item.lastUpdated,
         })) : [];
