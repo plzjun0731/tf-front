@@ -501,7 +501,8 @@ function AffiliateBusiness() {
                             ))}
                             <th>목표실적</th>
                             <th>업데이트</th>
-                            <th style={{ width: "120px" }}>저장/삭제</th>
+                            <th>저장</th>
+                            <th>삭제</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -547,6 +548,8 @@ function AffiliateBusiness() {
                                     >
                                         저장
                                     </span>
+                                </td>
+                                <td>
                                     <span 
                                         onClick={() => deleteRow(row.id)}
                                         style={{ 
