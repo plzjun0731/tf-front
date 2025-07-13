@@ -58,9 +58,9 @@ function AffiliateBusiness() {
             partnerName: formData.affiliateName,
             partnerUnit: formData.unit,
             partnerManager: formData.manager,
-            partnerNoticeDate1: formData.notice1,
-            partnerNoticeDate2: formData.notice2,
-            partnerNoticeDate3: formData.notice3,
+            noticeDate1: formData.notice1,
+            noticeDate2: formData.notice2,
+            noticeDate3: formData.notice3,
             partnerTargetValue: formData.goalPerformance
         }
 

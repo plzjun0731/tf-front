@@ -52,7 +52,7 @@ export async function getPartnerList() {
 }
 
 export async function insertPartnerInfo(formData) {
-    const response = await fetch(`${API_BASE_URL}/api/insertPartnerList`, {
+    const response = await fetch(`${API_BASE_URL}/api/insertPartner`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
