@@ -315,6 +315,30 @@
   vertical-align: top;
 }
 
+/* 회의 일시 입력 필드 스타일 개선 */
+.meeting-log-form .meeting-date-range {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.meeting-log-form input[type="datetime-local"] {
+  width: 48%;
+  min-width: 120px;
+  padding: 10px 12px;
+  border: 1px solid var(--white-25);
+  border-radius: 6px;
+  background-color: var(--white-10);
+  color: var(--text-color);
+  box-sizing: border-box;
+  font-family: inherit;
+  font-size: 1rem;
+}
+.meeting-log-form input[type="datetime-local"]:focus {
+  background-color: var(--white-15);
+  outline: none;
+  border-color: var(--color-gold-light);
+}
+
 /* === 폼 & 상세 보기 테이블 헤더 === */
 .meeting-log-form table thead th,
 .meeting-log-detail-form table thead th {

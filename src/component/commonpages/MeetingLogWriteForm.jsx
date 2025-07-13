@@ -6,8 +6,7 @@ const MeetingLogWriteForm = ({ onSave, onCancel, initialData }) => {
     initialData || {
       subject: "",
       location: "",
-      startDate: "",
-      endDate: "",
+      workDate: { start: "", end: "" },
       author: "",
       participants: "",
       absentees: "",
@@ -31,10 +30,18 @@ const MeetingLogWriteForm = ({ onSave, onCancel, initialData }) => {
   const [showContentWarning, setShowContentWarning] = useState(false);
 
   const handleChange = (field, value) => {
-    setFormData({ ...formData, [field]: value });
-    if ((field === "startDate" || field === "endDate") && value) {
-      setShowDateWarning(false); // 날짜가 입력되면 경고 숨김
-      setShowEndDateBeforeStartDateWarning(false); // 종료 일시 경고 숨김
+    if (field === "workDate.start" || field === "workDate.end") {
+      setFormData({
+        ...formData,
+        workDate: {
+          ...formData.workDate,
+          [field.split(".")[1]]: value,
+        },
+      });
+      setShowDateWarning(false);
+      setShowEndDateBeforeStartDateWarning(false);
+    } else {
+      setFormData({ ...formData, [field]: value });
     }
     if (field === "subject" && value) setShowSubjectWarning(false);
     if (field === "location" && value) setShowLocationWarning(false);
@@ -82,7 +89,7 @@ const MeetingLogWriteForm = ({ onSave, onCancel, initialData }) => {
     const newFollowUpDateWarnings = [...followUpDateWarnings];
 
     // 일시 유효성 검사
-    if (!formData.startDate || isNaN(new Date(formData.startDate).getTime())) {
+    if (!formData.workDate.start || isNaN(new Date(formData.workDate.start).getTime())) {
       setShowDateWarning(true);
       hasError = true;
     } else {
@@ -90,7 +97,7 @@ const MeetingLogWriteForm = ({ onSave, onCancel, initialData }) => {
     }
 
     // 종료 일시가 시작 일시보다 빠른 경우 경고
-    if (formData.startDate && formData.endDate && new Date(formData.endDate) < new Date(formData.startDate)) {
+    if (formData.workDate.start && formData.workDate.end && new Date(formData.workDate.end) < new Date(formData.workDate.start)) {
       setShowEndDateBeforeStartDateWarning(true);
       hasError = true;
     } else {
@@ -185,28 +192,26 @@ const MeetingLogWriteForm = ({ onSave, onCancel, initialData }) => {
               </td>
             </tr>
             <tr>
-              <td>시작 일시</td>
+              <td>회의 일시</td>
               <td>
-                <input
-                  type="datetime-local"
-                  value={formData.startDate}
-                  onChange={(e) => handleChange("startDate", e.target.value)}
-                />
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                  <input
+                    type="datetime-local"
+                    value={formData.workDate.start}
+                    onChange={(e) => handleChange("workDate.start", e.target.value)}
+                  />
+                  <span>~</span>
+                  <input
+                    type="datetime-local"
+                    value={formData.workDate.end}
+                    onChange={(e) => handleChange("workDate.end", e.target.value)}
+                  />
+                </div>
                 {showDateWarning && (
                   <p style={{ color: 'red', fontSize: '0.8em', marginTop: '5px' }}>
-                    시작 일시를 입력해주세요.
+                    회의 시작 일시를 입력해주세요.
                   </p>
                 )}
-              </td>
-            </tr>
-            <tr>
-              <td>종료 일시</td>
-              <td>
-                <input
-                  type="datetime-local"
-                  value={formData.endDate}
-                  onChange={(e) => handleChange("endDate", e.target.value)}
-                />
                 {showEndDateBeforeStartDateWarning && (
                   <p style={{ color: 'red', fontSize: '0.8em', marginTop: '5px' }}>
                     종료 일시는 시작 일시보다 빠를 수 없습니다.

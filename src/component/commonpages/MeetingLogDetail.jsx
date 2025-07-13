@@ -5,94 +5,58 @@ const MeetingLogDetail = ({
   log,
   onBack,
   onDelete,
-  onEdit,
-  onPrevious,
-  onNext,
-  hasPrevious,
-  hasNext,
-  currentIndex,
-  totalCount,
+  onEdit
 }) => {
   if (!log) return <p>회의록을 선택해주세요.</p>;
-
   return (
     <div className="meeting-log-detail-form">
       <div className="form-section">
-          <h2 className="section-title">회의 내용</h2>
-          <table>
-            <tbody>
-              <tr>
-                <th>주제</th>
-                <td>{log.subject}</td>
-              </tr>
-              <tr>
-                <th>장소</th>
-                <td>{log.location}</td>
-              </tr>
-              <tr>
-                <th>시작 일시</th>
-                <td>
-                  {new Date(log.startDate).toLocaleDateString("ko-KR", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })} ({new Date(log.startDate).toLocaleString("ko-KR", { weekday: "short" })}) {new Date(log.startDate).toLocaleTimeString("ko-KR", {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </td>
-              </tr>
-              {log.endDate && (
-                <tr>
-                  <th>종료 일시</th>
-                  <td>
-                    {new Date(log.endDate).toLocaleDateString("ko-KR", {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    })} ({new Date(log.endDate).toLocaleString("ko-KR", { weekday: "short" })}) {new Date(log.endDate).toLocaleTimeString("ko-KR", {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                  </td>
-                </tr>
-              )}
-              <tr>
-                <th>작성자</th>
-                <td>{log.author}</td>
-              </tr>
-              <tr>
-                <th>작성일시</th>
-                <td>
-                  {log.createdAt ? 
-                    `${new Date(log.createdAt).toLocaleDateString("ko-KR", {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    })} (${new Date(log.createdAt).toLocaleString("ko-KR", { weekday: "short" })}) ${new Date(log.createdAt).toLocaleTimeString("ko-KR", {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                      second: "2-digit",
-                    })}`
-                   : "정보 없음"}
-                </td>
-              </tr>
-              <tr>
-                <th>참여자</th>
-                <td>{log.participants}</td>
-              </tr>
-              <tr>
-                <th>결석자</th>
-                <td>{log.absentees}</td>
-              </tr>
-              <tr>
-                <th>내용</th>
-                <td className="pre-line">{log.content}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
+        <h2 className="section-title">회의 내용</h2>
+        <table>
+          <tbody>
+            <tr>
+              <th>주제</th>
+              <td>{log.subject}</td>
+            </tr>
+            <tr>
+              <th>장소</th>
+              <td>{log.location}</td>
+            </tr>
+            <tr>
+              <th>회의 일시</th>
+              <td>
+                {log.workDate && log.workDate.start && log.workDate.end
+                  ? `${new Date(log.workDate.start).toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' })} (${new Date(log.workDate.start).toLocaleString('ko-KR', { weekday: 'short' })}) ${new Date(log.workDate.start).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })} ~ ${new Date(log.workDate.end).toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' })} (${new Date(log.workDate.end).toLocaleString('ko-KR', { weekday: 'short' })}) ${new Date(log.workDate.end).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}`
+                  : '정보 없음'}
+              </td>
+            </tr>
+            <tr>
+              <th>작성자</th>
+              <td>{log.author}</td>
+            </tr>
+            <tr>
+              <th>작성일시</th>
+              <td>
+                {log.createdAt
+                  ? `${new Date(log.createdAt).toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' })} (${new Date(log.createdAt).toLocaleString('ko-KR', { weekday: 'short' })}) ${new Date(log.createdAt).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}`
+                  : '정보 없음'}
+              </td>
+            </tr>
+            <tr>
+              <th>참여자</th>
+              <td>{log.participants}</td>
+            </tr>
+            <tr>
+              <th>결석자</th>
+              <td>{log.absentees}</td>
+            </tr>
+            <tr>
+              <th>내용</th>
+              <td className="pre-line">{log.content}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
       <div className="right-panel">
         <div className="form-section">
           <h2 className="section-title">회의 요약</h2>
@@ -109,7 +73,6 @@ const MeetingLogDetail = ({
             </tbody>
           </table>
         </div>
-
         <div className="form-section follow-up-section">
           <h2 className="section-title">Follow-up</h2>
           <table>
@@ -128,14 +91,13 @@ const MeetingLogDetail = ({
                   <td>{item.job}</td>
                   <td>{item.assignee}</td>
                   <td>
-                    {new Date(item.dueDate).toLocaleDateString("ko-KR", {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    })}{" "}
-                    (
-                    {new Date(item.dueDate).toLocaleDateString("ko-KR", {
-                      weekday: "short",
+                    {new Date(item.dueDate).toLocaleDateString('ko-KR', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                    })} (
+                    {new Date(item.dueDate).toLocaleDateString('ko-KR', {
+                      weekday: 'short',
                     })}
                     )
                   </td>
@@ -145,7 +107,6 @@ const MeetingLogDetail = ({
           </table>
         </div>
       </div>
-
       <div className="detail-buttons">
         <button onClick={onBack}>목록으로</button>
         <button onClick={() => onEdit(log.id)}>수정</button>
@@ -153,6 +114,6 @@ const MeetingLogDetail = ({
       </div>
     </div>
   );
-};
+}
 
 export default MeetingLogDetail;

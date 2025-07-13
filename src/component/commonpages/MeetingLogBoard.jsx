@@ -217,7 +217,7 @@ const MeetingLogBoard = () => {
                 <th>주제</th>
                 <th>내용</th>
                 <th>작성자</th>
-                <th>시작 일시</th>
+                <th>회의 일시</th>
               </tr>
             </thead>
             <tbody>
@@ -227,7 +227,12 @@ const MeetingLogBoard = () => {
               </tr>
             ) : (
               [...filteredMeetingLogs]
-                .sort((a, b) => new Date(b.date) - new Date(a.date))
+                .sort((a, b) => {
+                  // workDate.start 기준으로 정렬
+                  const aDate = a.workDate?.start || a.startDate || a.date;
+                  const bDate = b.workDate?.start || b.startDate || b.date;
+                  return new Date(bDate) - new Date(aDate);
+                })
                 .map((log) => (
                   <tr
                     key={log.id}
@@ -238,14 +243,20 @@ const MeetingLogBoard = () => {
                     <td className="log-content">{log.content}</td>
                     <td className="log-author">{log.author}</td>
                     <td className="log-date">
-                      {new Date(log.startDate).toLocaleDateString("ko-KR", {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      })} ({new Date(log.startDate).toLocaleString("ko-KR", { weekday: "short" })}) {new Date(log.startDate).toLocaleTimeString("ko-KR", {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
+                      {log.workDate && log.workDate.start ? (
+                        <>
+                          {new Date(log.workDate.start).toLocaleDateString("ko-KR", {
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                          })} ({new Date(log.workDate.start).toLocaleString("ko-KR", { weekday: "short" })}) {new Date(log.workDate.start).toLocaleTimeString("ko-KR", {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </>
+                      ) : (
+                        <span>정보 없음</span>
+                      )}
                     </td>
                   </tr>
                 ))
