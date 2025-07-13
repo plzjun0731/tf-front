@@ -131,32 +131,15 @@ function AffiliateBusiness() {
 
     const saveChanges = async (rowId) => {
         const { field } = selectedCell || {};
-        const currentDate = getCurrentDate();
 
         if (field) {
             try {
-                await updatePartnerInfo(rowId, field, cellValue);
+                const updatedData = await updatePartnerInfo(rowId, field, cellValue);
+                const updatedList = await getPartnerList();
 
-                setTempRowData(prev => ({
-                    ...prev,
-                    [rowId]: {
-                        ...prev[rowId],
-                        [field]: cellValue
-                    }
-                }));
-
-                setData(prevData =>
-                    prevData.map(row =>
-                        row.id === rowId
-                            ? { ...row, 
-                                ...tempRowData[rowId], 
-                                [field]: cellValue,
-                                lastUpdated: getCurrentDate()
-                            }
-                            : row
-                    )
-                );
+                setData(updatedList);
                 alert('저장되었습니다.');
+
             } catch (error) {
                 alert('저장에 실패했습니다.');
                 console.error(error);

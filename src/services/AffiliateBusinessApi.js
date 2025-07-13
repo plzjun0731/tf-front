@@ -69,19 +69,32 @@ export async function insertPartnerInfo(formData) {
 }
 
 export async function updatePartnerInfo(partnerId, field, value) {
-    const response = await fetch(`${API_BASE_URL}/api/updatePartnerList/${partnerId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ field, value }),
-    });
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/updatePartner/${partnerId}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({ 
+                field, 
+                value,
+                lastUpdated: new Date().toISOString()
+            }),
+        });
 
-    if (!response.ok) throw new Error("제휴처 정보 업데이트 실패");
-    return await response.json();
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || `HTTP ${response.status}: 업데이트 실패`);
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error('업데이트 Api 에러:', error);
+        throw error;
+    }
 }
 
 export async function updateMonthlyPerformance(partnerId, year, month, field, value) {
-    const response = await fetch(`${API_BASE_URL}/api/updatePartnerList`, {
+    const response = await fetch(`${API_BASE_URL}/api/updatePartner`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
