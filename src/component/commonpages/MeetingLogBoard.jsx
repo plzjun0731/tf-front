@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import MeetingLogWriteForm from "./MeetingLogWriteForm";
 import MeetingLogDetail from "./MeetingLogDetail";
-import { getMeetingLogList, getMeetingLogDetail, writeMeetingLog } from "../../services/MeetingLogApi";
+import { getMeetingLogList, writeMeetingLog, getMeetingLogDetail } from "../../services/MeetingLogApi";
 import "../styles/MeetingLogBoard.css";
 
 const MeetingLogBoard = () => {
@@ -97,12 +97,16 @@ const MeetingLogBoard = () => {
     }
   };
 
-  const handleViewLog = (logId) => {
-    const logToView = meetingLogs.find((log) => log.id === logId);
-    const logIndex = filteredMeetingLogs.findIndex((log) => log.id === logId);
-    setSelectedLog(logToView);
-    setCurrentLogIndex(logIndex);
-    setViewMode("view");
+  const handleViewLog = async (logId) => {
+    try {
+        const detailLog = await getMeetingLogDetail(logId);
+        setSelectedLog(detailLog);
+        setViewMode("view");        
+    } catch (error) {
+        console.error('회의록 상세 페이지 로드 실패:', error);
+        alert('회의록을 불러오지 못했습니다.')
+    }
+    
   };
 
   const handleDeleteLog = (logId) => {

@@ -131,7 +131,7 @@ export async function getMeetingLogDetail(minutesId){
         const result = await response.json();
         console.log('불러오기 응답:', result);
 
-        if (!Array.isArray(result)) {
+        if (!result || typeof result !== 'object') {
             throw new Error("서버 응답이 올바르지 않습니다.");
         }
 
@@ -146,13 +146,7 @@ export async function getMeetingLogDetail(minutesId){
             content: result.minutesContent,
             conclusion: result.minutesResult,
             nextStep: result.Next,
-            followUp: result.boardFollowUp ? result.boardFollowUp : [ // 배열명 확인
-                {
-                    job: result.followupWork,
-                    assignee: result.followupPerformer,
-                    dueDate: result.followupDeadline
-                }
-            ].filter(item => item.job)
+            followUp: result.boardFollowUp || []
         };
 
     } catch(error){
