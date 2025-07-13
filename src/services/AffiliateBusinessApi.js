@@ -41,6 +41,9 @@ export async function getPartnerList() {
             notice3: item.noticeDate3,
             goalPerformance: item.partnerTargetValue,
             lastUpdated: item.lastUpdated,
+            notice1Img: item.noticeImg1 ? { url: item.noticeImg1 } : null,
+            notice2Img: item.noticeImg2 ? { url: item.noticeImg2 } : null,
+            notice1Img: item.noticeImg1 ? { url: item.noticeImg3 } : null,
         })) : [];
 
     } catch (error) {

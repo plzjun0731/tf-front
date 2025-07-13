@@ -229,10 +229,7 @@ function AffiliateBusiness() {
             const reader = new FileReader();
 
             reader.onload = (e) => {
-                const newImage = {
-                    url: e.target.result,
-                    name: file.name
-                };
+                const newImage = { url: e.target.result };
 
                 setData(prev =>
                     prev.map(row =>
@@ -339,7 +336,7 @@ function AffiliateBusiness() {
                     <div style={{ display: "flex", alignItems: "center", gap: "2px"}}>
                         {imageObj ? (
                             <>
-                                <img src={imageObj.url} alt={imageObj.name} width={100} height={100} />
+                                <img src={imageObj.url} width={100} height={100} />
                                 <div
                                     onClick={() => handleImageDelete(row.id, imageField)}
                                     style={{ cursor: "pointer"}}
