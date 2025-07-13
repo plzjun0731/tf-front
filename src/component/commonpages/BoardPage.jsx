@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import MenualPage from "./MenualPage";
-import MeetingLogBoard from "./MeetingLogBoard";
+// import MeetingLogBoard from "./MeetingLogBoard";
+import MeetingLogWriteForm from "./MeetingLogWriteForm";
 import AdminNoticeListPage from "./AdminNoticeListPage";
 import AdminNoticeDetailPage from "./AdminNoticeDetailPage";
 import AdminNoticeWritePage from "./AdminNoticeWritePage";
@@ -8,9 +9,9 @@ import '../styles/BoardPage.css';
 
 function BoardPage() {
     const [page, setPage] = useState('menual');
-    const [selectedNotice, setSelectedNotice] = useState(null);
     const [noticePage, setNoticePage] = useState("notice");
     const [noticeListKey, setNoticeListKey] = useState(0);
+    const [selectedNoticeId, setSelectedNoticeId] = useState(null);
 
     const menuItems = [
         { id: 'menual', label: '업무 매뉴얼' },
@@ -28,7 +29,7 @@ function BoardPage() {
             case 'menual':
                 return <MenualPage />;
             case 'minutes':
-                return <MeetingLogBoard />;
+                return <MeetingLogWriteForm />;
             case 'notice':
                 return renderNoticeContent();
             default:
@@ -43,13 +44,13 @@ function BoardPage() {
                     <AdminNoticeListPage
                         key={noticeListKey}
                         setPage={setNoticePage}
-                        setSelectedNotice={setSelectedNotice}
+                        setSelectedNotice={setSelectedNoticeId}
                     />
                 );
                 case "detail":
                     return (
                         <AdminNoticeDetailPage
-                            notice={selectedNotice}
+                            noticeId={selectedNoticeId}
                             setPage={setNoticePage}
                         />
                 );
@@ -65,7 +66,7 @@ function BoardPage() {
                         <AdminNoticeListPage
                             key={noticeListKey}
                             setPage={setNoticePage}
-                            setSelectedNotice={setSelectedNotice}
+                            setSelectedNotice={setSelectedNoticeId}
                         />
                     );
         }
