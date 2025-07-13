@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { ImagePlus, PencilLine, X, Check, ImageOff } from "lucide-react";
+import { insertPartnerInfo, getPartnerList, updatePartnerInfo } from "../../services/AffiliateBusinessApi";
+import "../styles/AffiliateBusiness.css";
 
 function AffiliateBusiness() {
     const [data, setData] = useState([]);
@@ -11,7 +13,7 @@ function AffiliateBusiness() {
         notice1: '',
         notice2: '',
         notice3: '',
-        goalPerformance: ''  // 통일: goalPerformance 사용
+        goalPerformance: '' 
     });
     const [selectedCell, setSelectedCell] = useState(null);
     const [cellValue, setCellValue] = useState('');
@@ -32,32 +34,42 @@ function AffiliateBusiness() {
         { key: 'dec', name: '12월'},
     ];
 
+    useEffect(() => {
+        const loadData = async () => {
+            try {
+                const data = await getPartnerList();
+                setData(data);
+            } catch (error) {
+                console.error('데이터 로드 실패:', error);
+            }
+        };
+        loadData();
+    }, []);
+
     const getCurrentDate = () => {
         const now = new Date();
         return now.toISOString().split('T')[0].replace(/-/g, '.');
     }
 
-    const handleSubmit = () => {
-        if (formData.affiliateName) {
-            const currentDate = getCurrentDate();
-            const monthlyData = {};
-            months.forEach(month => {
-                monthlyData[`${month.key}_db`] = '';
-                monthlyData[`${month.key}_exam`] = '';
-                monthlyData[`${month.key}_surgery`] = '';
-            })
-            setData([
-                ...data,
-                {
-                    ...formData,
-                    ...monthlyData,
-                    id: Date.now(),
-                    notice1Image: null,
-                    notice2Image: null,
-                    notice3Image: null,
-                    lastUpdated: currentDate
-                }
-            ]);
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        const sendData = {
+            partnerName: formData.affiliateName,
+            partnerUnit: formData.unit,
+            partnerManager: formData.manager,
+            partnerNoticeDate1: formData.notice1,
+            partnerNoticeDate2: formData.notice2,
+            partnerNoticeDate3: formData.notice3,
+            partnerTargetValue: formData.goalPerformance
+        }
+
+        try {
+            await insertPartnerInfo(sendData);
+
+            const updatedList = await getPartnerList();
+
+            setData(updatedList);
             setFormData({
                 affiliateName: '',
                 unit: '',
@@ -67,7 +79,41 @@ function AffiliateBusiness() {
                 notice3: '',
                 goalPerformance: ''
             });
+            alert("제휴처가 등록되었습니다.");
+        } catch (error) {
+            alert("제휴처 등록 중 오류가 발생했습니다.");
+            console.log(error);
         }
+        // if (formData.affiliateName) {
+        //     const currentDate = getCurrentDate();
+        //     const monthlyData = {};
+        //     months.forEach(month => {
+        //         monthlyData[`${month.key}_db`] = '';
+        //         monthlyData[`${month.key}_exam`] = '';
+        //         monthlyData[`${month.key}_surgery`] = '';
+        //     })
+        //     setData([
+        //         ...data,
+        //         {
+        //             ...formData,
+        //             ...monthlyData,
+        //             id: Date.now(),
+        //             notice1Image: null,
+        //             notice2Image: null,
+        //             notice3Image: null,
+        //             lastUpdated: currentDate
+        //         }
+        //     ]);
+        //     setFormData({
+        //         affiliateName: '',
+        //         unit: '',
+        //         manager: '',
+        //         notice1: '',
+        //         notice2: '',
+        //         notice3: '',
+        //         goalPerformance: ''
+        //     });
+        // }
     };
 
     const handleInputChange = (e) => {
@@ -83,32 +129,41 @@ function AffiliateBusiness() {
         setCellValue(tempData[field] !== undefined ? tempData[field] : currentValue);
     };
 
-    const saveChanges = (rowId) => {
+    const saveChanges = async (rowId) => {
         const { field } = selectedCell || {};
         const currentDate = getCurrentDate();
 
         if (field) {
-            setTempRowData(prev => ({
-                ...prev,
-                [rowId]: {
-                    ...prev[rowId],
-                    [field]: cellValue
-                }
-            }));
-        }
+            try {
+                await updatePartnerInfo(rowId, field, cellValue);
 
-        setData(prevData =>
-            prevData.map(row =>
-                row.id === rowId
-                    ? { ...row, 
-                        ...tempRowData[rowId], 
-                        ...(field ? { [field]: cellValue } : {}),
-                        lastUpdated: currentDate
+                setTempRowData(prev => ({
+                    ...prev,
+                    [rowId]: {
+                        ...prev[rowId],
+                        [field]: cellValue
                     }
-                    : row
-            )
-        );
+                }));
 
+                setData(prevData =>
+                    prevData.map(row =>
+                        row.id === rowId
+                            ? { ...row, 
+                                ...tempRowData[rowId], 
+                                [field]: cellValue,
+                                lastUpdated: getCurrentDate()
+                            }
+                            : row
+                    )
+                );
+                alert('저장되었습니다.');
+            } catch (error) {
+                alert('저장에 실패했습니다.');
+                console.error(error);
+                return; 
+            }
+        }
+        // cleanup
         setTempRowData(prev => {
             const updated = { ...prev };
             delete updated[rowId];
