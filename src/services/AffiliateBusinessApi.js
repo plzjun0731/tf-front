@@ -39,11 +39,11 @@ export async function getPartnerList() {
             notice1: item.noticeDate1,
             notice2: item.noticeDate2,
             notice3: item.noticeDate3,
-            goalPerformance: item.partnerTargetValue,
+            goalPerformance: item.TargetValue,
             lastUpdated: item.lastUpdated,
             notice1Img: item.noticeImg1 ? { url: item.noticeImg1 } : null,
             notice2Img: item.noticeImg2 ? { url: item.noticeImg2 } : null,
-            notice1Img: item.noticeImg1 ? { url: item.noticeImg3 } : null,
+            notice3Img: item.noticeImg3 ? { url: item.noticeImg3 } : null,
         })) : [];
 
     } catch (error) {
@@ -75,21 +75,33 @@ export async function updatePartnerInfo(partnerData, images = {}) {
     try {
         const formData = new FormData();
 
-        formData.append("partnerId", partnerData.partnerId);
-        formData.append("partnerName", partnerData.partnerName || '');
-        formData.append("partnerUnit", partnerData.partnerUnit || '');
-        formData.append("partnerManager", partnerData.partnerManager || '');
-        formData.append("noticeDate1", partnerData.noticeData1 || '');
-        formData.append("noticeDate2", partnerData.noticeData2 || '');
-        formData.append("noticeDate3", partnerData.noticeData3 || '');
-        formData.append("partnerTargetValue", partnerData.partnerTargetValue || '');
-        formData.append("lastUpdated", new Date().toISOString());
+        const partnerDTO = {
+            partnerId: partnerData.partnerId,
+            partnerName: partnerData.partnerName || '',
+            partnerUnit: partnerData.partnerUnit || '',
+            partnerManager: partnerData.partnerManager || '',
+            noticeDate1: partnerData.noticeDate1 || '',
+            noticeDate2: partnerData.noticeDate2 || '',
+            noticeDate3: partnerData.noticeDate3 || '',
+            TargetValue: partnerData.TargetValue || '',
+            lastUpdated: new Date().toISOString()
+        };
 
-        if (images.noticeImg1) formData.append("noticeImg1", images.noticeImg1);
-        if (images.noticeImg2) formData.append("noticeImg2", images.noticeImg2);
-        if (images.noticeImg3) formData.append("noticeImg3", images.noticeImg3);
+        // JSON을 Blob으로 변환해서 추가
+        formData.append('partnerDTO', new Blob([JSON.stringify(partnerDTO)], {
+            type: 'application/json'
+        }));
 
-        const response = await fetch('${API_BASE_URL}/api/updatePartner', {
+        if (images.notice1Img) formData.append("noticeImg1", images.notice1Img);
+        if (images.notice2Img) formData.append("noticeImg2", images.notice2Img);
+        if (images.notice3Img) formData.append("noticeImg3", images.notice3Img);
+
+        console.log('FormData 내용 확인:'); 
+        for (let [key, value] of formData.entries()) {
+            console.log(key, value);
+        }
+
+        const response = await fetch(`${API_BASE_URL}/api/updatePartner`, {
             method: "POST",
             credentials: "include",
             body: formData,

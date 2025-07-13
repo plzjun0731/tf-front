@@ -16,7 +16,6 @@ function AffiliateBusiness() {
         goalPerformance: '' 
     });
     const [imageFiles, setImageFiles] = useState({});
-    
     const [selectedCell, setSelectedCell] = useState(null);
     const [cellValue, setCellValue] = useState('');
     const [tempRowData, setTempRowData] = useState({});
@@ -63,7 +62,7 @@ function AffiliateBusiness() {
             noticeDate1: formData.notice1,
             noticeDate2: formData.notice2,
             noticeDate3: formData.notice3,
-            partnerTargetValue: formData.goalPerformance
+            TargetValue: formData.goalPerformance
         }
 
         try {
@@ -128,7 +127,8 @@ function AffiliateBusiness() {
     const handleCellClick = (rowId, field, currentValue) => {
         setSelectedCell({ rowId, field });
         const tempData = tempRowData[rowId] || {};
-        setCellValue(tempData[field] !== undefined ? tempData[field] : currentValue);
+        const valueToSet = tempData[field] !== undefined ? tempData[field] : (currentValue || '');
+        setCellValue(valueToSet);
     };
 
     const saveChanges = async (rowId) => {
@@ -143,7 +143,7 @@ function AffiliateBusiness() {
                 }
 
                 const tempData = tempRowData[rowId] || {};
-
+                
                 const partnerData = {
                     partnerId: currentRow.id,
                     partnerName: tempData.affiliateName !== undefined ? tempData.affiliateName : currentRow.affiliateName,
@@ -152,22 +152,32 @@ function AffiliateBusiness() {
                     noticeDate1: tempData.notice1 !== undefined ? tempData.notice1 : currentRow.notice1,
                     noticeDate2: tempData.notice2 !== undefined ? tempData.notice2 : currentRow.notice2,
                     noticeDate3: tempData.notice3 !== undefined ? tempData.notice3 : currentRow.notice3,
-                    partnerTargetValue: tempData.goalPerformance !== undefined ? tempData.goalPerformance : currentRow.goalPerformance,
-                    
-                    [   
-                        field === 'affiliateName' ? 'partnerName' :
-                        field === 'unit' ? 'partnerUnit' :
-                        field === 'manager' ? 'partnerManager' :
-                        field === 'goalPerformance' ? 'partnerTargetValue' :
-                        field
-                    ]: cellValue
+                    TargetValue: tempData.goalPerformance !== undefined ? tempData.goalPerformance : currentRow.goalPerformance,
                 };
 
+                if (field === 'affiliateName') {
+                    partnerData.partnerName = cellValue;
+                } else if (field === 'unit') {
+                    partnerData.partnerUnit = cellValue;
+                } else if (field === 'manager') {
+                    partnerData.partnerManager = cellValue;
+                } else if (field === 'goalPerformance') {
+                    partnerData.TargetValue = cellValue;
+                } else if (field === 'notice1') {
+                    partnerData.noticeDate1 = cellValue;
+                } else if (field === 'notice2') {
+                    partnerData.noticeDate2 = cellValue;
+                } else if (field === 'notice3') {
+                    partnerData.noticeDate3 = cellValue;
+                }
+
                 const images = imageFiles[rowId] || {};
+                console.log('전송할 데이터:', partnerData);
+                console.log('전송할 이미지:', images);
 
-                const updatedData = await updatePartnerInfo(partnerData, images);
+                await updatePartnerInfo(partnerData, images);
+
                 const updatedList = await getPartnerList();
-
                 setData(updatedList);
                 alert('저장되었습니다.');
 
@@ -256,16 +266,15 @@ function AffiliateBusiness() {
                             : row
                     )
                 );
-                reader.readAsDataURL(file);
-
-                setImageFiles(prev => ({
-                    ...prev,
-                    [rowId]: {
-                        ...prev[rowId],
-                        [field]: file 
-                    }
-                }));
             };
+            reader.readAsDataURL(file);
+            setImageFiles(prev => ({
+                ...prev,
+                [rowId]: {
+                    ...prev[rowId],
+                    [field]: file 
+                }
+            }));
         }
     };
 
@@ -288,7 +297,8 @@ function AffiliateBusiness() {
                     }
                 }
                 return updated;
-            })
+            });
+            console.log('이미지 삭제:', { rowId, field });
         }
     };
 
@@ -301,14 +311,14 @@ function AffiliateBusiness() {
     const renderCell = (row, field) => {
         const isEditing = selectedCell?.rowId === row.id && selectedCell?.field === field;
         const tempData = tempRowData[row.id] || {};
-        const displayValue = tempData[field] !== undefined ? tempData[field] : row[field];
+        const displayValue = tempData[field] !== undefined ? tempData[field] : (row[field] || '');
 
         if (isEditing && !isImageField(field)) {
             return (
                 <div style={{ display: "flex", alignItems: "center", gap: "2px" }}>
                     <input
                         type={isDateField(field) ? "date" : isNumberField(field) ? "number" : "text"}
-                        value={cellValue}
+                        value={cellValue || ''}
                         onChange={(e) => setCellValue(e.target.value)}
                         autoFocus
                         onKeyDown={(e) => e.key === 'Enter' && saveChanges(row.id)}
@@ -401,7 +411,6 @@ function AffiliateBusiness() {
 
     return (
         <div className="content-area">
-            {/* 입력 폼 */}
             <div className="input-group">
                 <label>제휴처명:
                     <input
@@ -469,37 +478,30 @@ function AffiliateBusiness() {
                 </label>
                 <button className="button" onClick={handleSubmit}>입력</button>
             </div>
-
-            {/* 월별 실적 토글 버튼 */}
-            <div style={{ marginBottom: "10px" }}>
-                <button 
-                    className="button"
-                    onClick={() => setShowMonthly(!showMonthly)}
-                >
-                    {showMonthly ? "월별 실적 숨기기" : "월별 실적 보기"}
-                </button>
-            </div>
-
-            {/* 테이블 스크롤 컨테이너 */}
-            <div style={{ overflowX: "auto" }}>
-                <table className="table" style={{ minWidth: showMonthly ? "2000px" : "800px" }}>
+            <div className="table-scroll" style={{ overflowX: "auto" }}>
+                <table className="table" style={{ minWidth: showMonthly ? "4000px" : "1800px", tableLayout: "fixed" }}>
                     <thead>
                         <tr>
                             <th>제휴처명</th>
                             <th>단위</th>
-                            {!showMonthly && <th>담당자</th>}
-                            {!showMonthly && <th>공지 1차</th>}
-                            {!showMonthly && <th>공지 2차</th>}
-                            {!showMonthly && <th>공지 3차</th>}
+                            <th>담당자</th>
+                            <th style={{ width: "300px" }}>공지 1차</th>
+                            <th style={{ width: "300px" }}>공지 2차</th>
+                            <th style={{ width: "300px" }}>공지 3차</th>
+                            <th style={{ width: "100px" }}>
+                                <div onClick={() => setShowMonthly(!showMonthly)} style={{ cursor: "pointer" }}>
+                                    {showMonthly ? "월별 ◀" : "월별 ▶"}
+                                </div>
+                            </th>
                             {showMonthly && months.map(month => (
-                                <th key={month.key} style={{ minWidth: "150px" }}>
+                                <th key={month.key}>
                                     <div>{month.name}</div>
-                                    <div style={{ fontSize: "12px", opacity: "0.8" }}>DB/검사/수술</div>
+                                    <div>DB|검사|수술</div>
                                 </th>
                             ))}
-                            {!showMonthly && <th>목표실적</th>}
-                            {!showMonthly && <th>업데이트</th>}
-                            <th>저장/삭제</th>
+                            <th>목표실적</th>
+                            <th>업데이트</th>
+                            <th style={{ width: "120px" }}>저장/삭제</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -507,41 +509,56 @@ function AffiliateBusiness() {
                             group.rows.map((row, idx) => (
                             <tr key={row.id}>
                                 {idx === 0 && (
-                                <td rowSpan={group.rows.length} style={{ verticalAlign: "middle", fontWeight: "bold" }}>
-                                    {affiliateName}
-                                </td>
+                                    <td rowSpan={group.rows.length} style={{ verticalAlign: "middle" }}>
+                                        {affiliateName}
+                                    </td>
                                 )}
                                 <td>{renderCell(row, "unit")}</td>
-                                {!showMonthly && <td>{renderCell(row, "manager")}</td>}
-                                {!showMonthly && <td>{renderCell(row, "notice1")}</td>}
-                                {!showMonthly && <td>{renderCell(row, "notice2")}</td>}
-                                {!showMonthly && <td>{renderCell(row, "notice3")}</td>}
+                                <td>{renderCell(row, "manager")}</td>
+                                <td>{renderCell(row, "notice1")}</td>
+                                <td>{renderCell(row, "notice2")}</td>
+                                <td>{renderCell(row, "notice3")}</td>
+                                <td style={{ minWidth: "80px" }}></td>
                                 {showMonthly && months.map(month => (
                                     <td key={month.key} style={{ padding: "0", border: "1px solid #ccc" }}>
                                         <div style={{ display: "flex", height: "100%" }}>
-                                            <div style={{ flex: 1, borderRight: "1px solid #ccc", padding: "6px 4px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                                            <div style={{ flex: 1, borderRight: "1px solid #ccc", padding: "8px 6px", display: "flex", alignItems: "center", justifyContent: "center" }}>
                                                 {renderCell(row, `${month.key}_db`)}
                                             </div>
-                                            <div style={{ flex: 1, borderRight: "1px solid #ccc", padding: "6px 4px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                                            <div style={{ flex: 1, borderRight: "1px solid #ccc", padding: "8px 6px", display: "flex", alignItems: "center", justifyContent: "center" }}>
                                                 {renderCell(row, `${month.key}_exam`)}
                                             </div>
-                                            <div style={{ flex: 1, padding: "6px 4px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                                            <div style={{ flex: 1, padding: "8px 6px", display: "flex", alignItems: "center", justifyContent: "center" }}>
                                                 {renderCell(row, `${month.key}_surgery`)}
                                             </div>
                                         </div>
                                     </td>
                                 ))}
                                 <td>{renderCell(row, "goalPerformance")}</td>
-                                <td style={{ fontSize: "12px" }}>
-                                    {row.lastUpdated || getCurrentDate()}
-                                </td>
+                                <td>{row.lastUpdated || getCurrentDate()}</td>
                                 <td>
-                                    <span style={{ cursor: "pointer", textDecoration: "underline" }} onClick={() => saveChanges(row.id)}>저장</span>
-                                    <span style={{ cursor: "pointer", textDecoration: "underline" }} onClick={() => deleteRow(row.id)}>삭제</span>
+                                    <span 
+                                        onClick={() => saveChanges(row.id)}
+                                        style={{ 
+                                            cursor: "pointer", 
+                                            textDecoration: "underline",
+                                            marginRight: "10px"
+                                        }}
+                                    >
+                                        저장
+                                    </span>
+                                    <span 
+                                        onClick={() => deleteRow(row.id)}
+                                        style={{ 
+                                            cursor: "pointer", 
+                                            textDecoration: "underline"
+                                        }}
+                                    >
+                                        삭제
+                                    </span>
                                 </td>
                             </tr>
-                            ))
-                        )}
+                        )))}
                     </tbody>
                 </table>
             </div>
