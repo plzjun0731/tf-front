@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import MeetingLogWriteForm from "./MeetingLogWriteForm";
+import MeetingLogDetail from "./MeetingLogDetail";
 import "../styles/MeetingLogBoard.css";
 
 const MeetingLogWriteForm = ({ onSave, onCancel, initialData }) => {
