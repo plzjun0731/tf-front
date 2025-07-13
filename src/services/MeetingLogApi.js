@@ -64,11 +64,14 @@ export async function writeMeetingLog(formData) {
                 followUpDeadline: item.dueDate
             }))
         }
+        
+        console.log('전송할 데이터:', sendData);
+
         const response = await fetch(`${API_BASE_URL}/api/writeMeetingLog`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             credentials: "include",
-            body: JSON.stringify(formData),
+            body: JSON.stringify(sendData),
         });
 
         if (!response.ok) {
@@ -86,7 +89,6 @@ export async function writeMeetingLog(formData) {
         }
 
         const result = await response.json();
-        console.log(formData);
         console.log('저장 응답:', result);
 
         if (!result || typeof result !== 'object') {
