@@ -225,9 +225,9 @@ function AffiliateBusiness() {
 
                 // 이미지 필드명 매핑
                 const imageMapping = {
-                    'notice1Image': 'notice1Img',
-                    'notice2Image': 'notice2Img', 
-                    'notice3Image': 'notice3Img'
+                    'notice1Img': 'noticeImg1',
+                    'notice2Img': 'noticeImg2', 
+                    'notice3Img': 'noticeImg3'
                 };
 
                 const images = {

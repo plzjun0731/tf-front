@@ -92,9 +92,9 @@ export async function updatePartnerInfo(partnerData, images = {}) {
             type: 'application/json'
         }));
 
-        if (images.notice1Img) formData.append("noticeImg1", images.notice1Img);
-        if (images.notice2Img) formData.append("noticeImg2", images.notice2Img);
-        if (images.notice3Img) formData.append("noticeImg3", images.notice3Img);
+        if (images.noticeImg1) formData.append("noticeImg1", images.noticeImg1);
+        if (images.noticeImg2) formData.append("noticeImg2", images.noticeImg2);
+        if (images.noticeImg3) formData.append("noticeImg3", images.noticeImg3);
 
         console.log('FormData 내용 확인:');
 
@@ -139,6 +139,7 @@ export async function deletePartnerInfo(partnerId) {
         const response = await fetch(`${API_BASE_URL}/api/deletePartner`, {
             method: "DELETE",
             headers: { "Content-Type": "application/json"},
+            credentials: "include",
             body: JSON.stringify({ partnerId: partnerId })
         });
 
