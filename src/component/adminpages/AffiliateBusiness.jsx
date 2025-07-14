@@ -346,6 +346,13 @@ function AffiliateBusiness() {
             const imageField = field + "Img";
             const tempData = tempRowData[row.id] || {};
             const imageObj = tempData[imageField] !== undefined ? tempData[imageField] : row[imageField];
+            console.log(`${field} 이미지 디버깅:`, {
+                field,
+                imageField,
+                imageObj,
+                'imageObj?.url': imageObj?.url,
+                'row[imageField]': row[imageField]
+            });
 
             return (
                 <div className="date-image-container">
@@ -355,7 +362,20 @@ function AffiliateBusiness() {
                     <div className="image-actions">
                         {imageObj && imageObj.url ? (
                             <>
-                                <img src={imageObj.url} className="notice-image" />
+                                <img 
+                                    src={imageObj.url} 
+                                    className="notice-image"
+                                    onError={(e) => {
+                                        console.error('이미지 로드 실패:', {
+                                            url: imageObj.url,
+                                            error: e.target.error,
+                                            naturalWidth: e.target.naturalWidth,
+                                            naturalHeight: e.target.naturalHeight
+                                        });
+                                    }}
+                                    onLoad={() => {
+                                        console.log('이미지 로드 성공:', imageObj.url);
+                                    }} />
                                 <button className="image-delete-btn" onClick={() => handleImageDelete(row.id, imageField)}>
                                     <ImageOff size={16}/>
                                 </button>
