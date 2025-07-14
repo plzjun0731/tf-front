@@ -84,7 +84,6 @@ export async function updatePartnerInfo(partnerData, images = {}) {
             noticeDate2: partnerData.noticeDate2 || '',
             noticeDate3: partnerData.noticeDate3 || '',
             targetValue: partnerData.targetValue || '',
-            lastUpdated: partnerData.lastUpdated || ''
         };
 
         // JSON을 Blob으로 변환해서 추가

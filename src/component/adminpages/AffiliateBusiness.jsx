@@ -47,11 +47,6 @@ function AffiliateBusiness() {
         loadData();
     }, []);
 
-    const getCurrentDate = () => {
-        const now = new Date();
-        return now.toISOString();
-    }
-
     const handleSubmit = async () => {
         if (formData.partnerName) {
             try {
@@ -96,11 +91,12 @@ function AffiliateBusiness() {
         try {
             const original = data.find(r => r.id === rowId);
             const { field } = selectedCell || {};
+            const tempData = tempRowData[rowId] || {};
             
             // 현재 편집 중인 필드 값과 임시 데이터 합치기
             const updatedData = {
                 ...original,
-                ...tempRowData[rowId],
+                ...tempData,
                 ...(field ? { [field]: cellValue } : {}),
             };
 
@@ -114,10 +110,25 @@ function AffiliateBusiness() {
                 noticeDate2: updatedData.notice2,
                 noticeDate3: updatedData.notice3,
                 targetValue: updatedData.goalPerformance,
-                lastUpdated: getCurrentDate()
             };
 
-            await updatePartnerInfo(updateData);
+            const images = {};
+            const imageFields = ['notice1Img', 'notice2Img', 'notice3Img'];
+            const serverFieldMap = {
+                'notice1Img': 'noticeImg1',
+                'notice2Img': 'noticeImg2', 
+                'notice3Img': 'noticeImg3'
+            };
+
+            imageFields.forEach(imageField => {
+                const imageData = tempData[imageField];
+                if (imageData && imageData.file && imageData.isPreview) {
+                    // 새로 업로드된 파일이 있으면 추가
+                    images[serverFieldMap[imageField]] = imageData.file;
+                }
+            });
+
+            await updatePartnerInfo(updateData, images);
             alert('저장되었습니다.');
             
             // 데이터 다시 로드
@@ -194,7 +205,7 @@ function AffiliateBusiness() {
                     const previewImage = {
                         url: e.target.result,
                         name: file.name,
-                        isPreview: true // 미리보기임을 표시
+                        isPreview: true // 미리보기
                     };
 
                     // 즉시 화면에 미리보기 표시
@@ -220,7 +231,6 @@ function AffiliateBusiness() {
                     noticeDate2: original.notice2,
                     noticeDate3: original.notice3,
                     targetValue: original.goalPerformance,
-                    lastUpdated: getCurrentDate()
                 };
 
                 // 이미지 필드명 매핑
@@ -257,26 +267,47 @@ function AffiliateBusiness() {
     const handleImageDelete = async (rowId, field) => {
         if (window.confirm("정말로 삭제하시겠습니까?")) {
             try {
-                const original = data.find(r => r.id === rowId);
-                
-                const updateData = {
-                    partnerId: rowId,
-                    partnerName: original.affiliateName,
-                    partnerUnit: original.unit,
-                    partnerManager: original.manager,
-                    noticeDate1: original.notice1,
-                    noticeDate2: original.notice2,
-                    noticeDate3: original.notice3,
-                    targetValue: original.goalPerformance,
-                    lastUpdated: getCurrentDate(),
-                    [field]: null // 이미지 필드를 null로 설정
-                };
+                const tempData = tempRowData[rowId] || {};
+                const imageData = tempData[field];
+                if (imageData && imageData.isPreview) {
+                    // 미리보기 이미지면 임시 데이터에서만 제거
+                    setData(prev =>
+                        prev.map(row =>
+                            row.id === rowId
+                                ? { ...row, [field]: null }
+                                : row
+                        )
+                    );
+                    
+                    setTempRowData(prev => ({
+                        ...prev,
+                        [rowId]: {
+                            ...prev[rowId],
+                            [field]: null
+                        }
+                    }));
+                } else {
+                    // 서버에 저장된 이미지면 즉시 서버에서 삭제
+                    const original = data.find(r => r.id === rowId);
+                    
+                    const updateData = {
+                        partnerId: rowId,
+                        partnerName: original.affiliateName,
+                        partnerUnit: original.unit,
+                        partnerManager: original.manager,
+                        noticeDate1: original.notice1,
+                        noticeDate2: original.notice2,
+                        noticeDate3: original.notice3,
+                        targetValue: original.goalPerformance,
+                        [field]: null // 이미지 필드를 null로 설정
+                    };
 
-                await updatePartnerInfo(updateData);
-                
-                // 데이터 다시 로드
-                const refreshedList = await getPartnerList();
-                setData(refreshedList);
+                    await updatePartnerInfo(updateData);
+                    
+                    // 데이터 다시 로드
+                    const refreshedList = await getPartnerList();
+                    setData(refreshedList);
+                }
             } catch (error) {
                 alert("이미지 삭제 실패: " + error.message);
             }
@@ -317,7 +348,8 @@ function AffiliateBusiness() {
 
         if (isDateField(field)) {
             const imageField = field + "Img";
-            const imageObj = row[imageField];
+            const tempData = tempRowData[row.id] || {};
+            const imageObj = tempData[imageField] !== undefined ? tempData[imageField] : row[imageField];
 
             return (
                 <div className="date-image-container">
@@ -327,7 +359,7 @@ function AffiliateBusiness() {
                     <div className="image-actions">
                         {imageObj && imageObj.url ? (
                             <>
-                                <img src={imageObj.url} alt="공지이미지" className="notice-image" />
+                                <img src={imageObj.url} className="notice-image" />
                                 <button className="image-delete-btn" onClick={() => handleImageDelete(row.id, imageField)}>
                                     <ImageOff size={16}/>
                                 </button>
@@ -493,7 +525,7 @@ function AffiliateBusiness() {
                                     </td>
                                 ))}
                                 <td>{renderCell(row, "goalPerformance")}</td>
-                                <td>{row.lastUpdated ? new Date(row.lastUpdated).toLocaleDateString('ko-KR') : ''}</td>
+                                <td>{row.lastUpdated ? row.lastUpdated.split(' ')[0] : ''}</td>
                                 <td>
                                     <button className="button" onClick={() => saveChanges(row.id)}>
                                         저장
