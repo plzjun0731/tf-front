@@ -22,7 +22,6 @@
   padding:20px;
   overflow: visible;
   position: relative;
-
 }
 
 .button {
@@ -66,6 +65,10 @@
 
 .input::placeholder {
   color: var(--white-50);
+}
+
+.table-scroll {
+  overflow-x: auto;
 }
 
 .table {
@@ -112,4 +115,121 @@
 
 .table-scroll::-webkit-scrollbar-track {
   background: transparent;
+}
+
+/* 셀 편집 스타일 */
+.cell-editing {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+}
+
+.cell-input {
+  flex: 1;
+  min-width: 60px;
+  max-width: 100%;
+  padding: 2px 4px;
+  border: 1px solid var(--color-gold-light);
+  border-radius: 4px;
+  background-color: var(--white-25);
+  color: #ffffff;
+  font-size: 12px;
+}
+
+.cell-edit-btn {
+  padding: 2px;
+  background: var(--color-gold-light);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  color: var(--color-navy-dark);
+}
+
+.cell-edit-btn:hover {
+  background-color: var(--color-gold-dark);
+}
+
+.cell-display {
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  min-height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cell-display:hover {
+  background-color: var(--white-15);
+}
+
+/* 날짜와 이미지 컨테이너 */
+.date-image-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+}
+
+.image-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* 공지 이미지 스타일 */
+.notice-image {
+  max-width: 80px;
+  max-height: 60px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid var(--white-25);
+  cursor: pointer;
+}
+
+.notice-image:hover {
+  border-color: var(--color-gold-light);
+}
+
+/* 이미지 업로드 라벨 */
+.image-upload-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  background-color: var(--white-15);
+  border: 1px dashed var(--white-25);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.image-upload-label:hover {
+  background-color: var(--white-25);
+  border-color: var(--color-gold-light);
+}
+
+/* 이미지 삭제 버튼 */
+.image-delete-btn {
+  padding: 4px;
+  background-color: #dc3545;
+  border: none;
+  border-radius: 4px;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.image-delete-btn:hover {
+  background-color: #c82333;
 }

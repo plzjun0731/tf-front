@@ -84,7 +84,7 @@ export async function updatePartnerInfo(partnerData, images = {}) {
             noticeDate2: partnerData.noticeDate2 || '',
             noticeDate3: partnerData.noticeDate3 || '',
             targetValue: partnerData.targetValue || '',
-            lastUpdated: new Date().toISOString()
+            lastUpdated: partnerData.lastUpdated || ''
         };
 
         // JSON을 Blob으로 변환해서 추가
@@ -136,9 +136,10 @@ export async function updatePartnerInfo(partnerData, images = {}) {
 
 export async function deletePartnerInfo(partnerId) {
     try {
-        const response = await fetch(`${API_BASE_URL}/api/deletePartner/${partnerId}`, {
+        const response = await fetch(`${API_BASE_URL}/api/deletePartner`, {
             method: "DELETE",
-            credentials: "include",
+            headers: { "Content-Type": "application/json"},
+            body: JSON.stringify({ partnerId: partnerId })
         });
 
         if (!response.ok) {

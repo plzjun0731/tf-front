@@ -49,7 +49,7 @@ function AffiliateBusiness() {
 
     const getCurrentDate = () => {
         const now = new Date();
-        return now.toISOString().split('T')[0].replace(/-/g, '.');
+        return now.toISOString();
     }
 
     const handleSubmit = async () => {
@@ -114,6 +114,7 @@ function AffiliateBusiness() {
                 noticeDate2: updatedData.notice2,
                 noticeDate3: updatedData.notice3,
                 targetValue: updatedData.goalPerformance,
+                lastUpdated: getCurrentDate()
             };
 
             await updatePartnerInfo(updateData);
@@ -186,6 +187,28 @@ function AffiliateBusiness() {
         if (files && files.length > 0) {
             try {
                 const file = files[0];
+                
+                // 즉시 미리보기 표시 (로컬 URL 생성)
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const previewImage = {
+                        url: e.target.result,
+                        name: file.name,
+                        isPreview: true // 미리보기임을 표시
+                    };
+
+                    // 즉시 화면에 미리보기 표시
+                    setData(prev =>
+                        prev.map(row =>
+                            row.id === rowId
+                                ? { ...row, [field]: previewImage }
+                                : row
+                        )
+                    );
+                };
+                reader.readAsDataURL(file);
+
+                // 백그라운드에서 서버에 업로드
                 const original = data.find(r => r.id === rowId);
                 
                 const updateData = {
@@ -197,6 +220,7 @@ function AffiliateBusiness() {
                     noticeDate2: original.notice2,
                     noticeDate3: original.notice3,
                     targetValue: original.goalPerformance,
+                    lastUpdated: getCurrentDate()
                 };
 
                 // 이미지 필드명 매핑
@@ -212,11 +236,20 @@ function AffiliateBusiness() {
 
                 await updatePartnerInfo(updateData, images);
                 
-                // 데이터 다시 로드
+                // 서버 업로드 완료 후 실제 URL로 교체
                 const refreshedList = await getPartnerList();
                 setData(refreshedList);
+                
             } catch (error) {
                 alert("이미지 업로드 실패: " + error.message);
+                // 에러 시 미리보기 제거
+                setData(prev =>
+                    prev.map(row =>
+                        row.id === rowId
+                            ? { ...row, [field]: null }
+                            : row
+                    )
+                );
             }
         }
     };
@@ -235,6 +268,7 @@ function AffiliateBusiness() {
                     noticeDate2: original.notice2,
                     noticeDate3: original.notice3,
                     targetValue: original.goalPerformance,
+                    lastUpdated: getCurrentDate(),
                     [field]: null // 이미지 필드를 null로 설정
                 };
 
@@ -291,7 +325,7 @@ function AffiliateBusiness() {
                         {displayValue || <PencilLine size={16} />}
                     </div>
                     <div className="image-actions">
-                        {imageObj ? (
+                        {imageObj && imageObj.url ? (
                             <>
                                 <img src={imageObj.url} alt="공지이미지" className="notice-image" />
                                 <button className="image-delete-btn" onClick={() => handleImageDelete(row.id, imageField)}>
@@ -444,22 +478,22 @@ function AffiliateBusiness() {
                                 <td>{renderCell(row, "notice3")}</td>
                                 <td style={{ minWidth: "80px" }}></td>
                                 {showMonthly && months.map(month => (
-                                    <td key={month.key} className="monthly-td">
-                                        <div className="monthly-cell">
-                                            <div className="monthly-subcell">
+                                    <td key={month.key} style={{ padding: "0", border: "1px solid #ccc" }}>
+                                        <div style={{ display: "flex", height: "100%" }}>
+                                            <div style={{ flex: 1, borderRight: "1px solid #ccc", padding: "8px 6px", display: "flex", alignItems: "center", justifyContent: "center" }}>
                                                 {renderCell(row, `${month.key}_db`)}
                                             </div>
-                                            <div className="monthly-subcell">
+                                            <div style={{ flex: 1, borderRight: "1px solid #ccc", padding: "8px 6px", display: "flex", alignItems: "center", justifyContent: "center" }}>
                                                 {renderCell(row, `${month.key}_exam`)}
                                             </div>
-                                            <div className="monthly-subcell">
+                                            <div style={{ flex: 1, padding: "8px 6px", display: "flex", alignItems: "center", justifyContent: "center" }}>
                                                 {renderCell(row, `${month.key}_surgery`)}
                                             </div>
                                         </div>
                                     </td>
                                 ))}
                                 <td>{renderCell(row, "goalPerformance")}</td>
-                                <td>{row.lastUpdated || getCurrentDate()}</td>
+                                <td>{row.lastUpdated ? new Date(row.lastUpdated).toLocaleDateString('ko-KR') : ''}</td>
                                 <td>
                                     <button className="button" onClick={() => saveChanges(row.id)}>
                                         저장
