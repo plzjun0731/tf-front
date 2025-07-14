@@ -91,11 +91,21 @@ export async function updatePartnerInfo(partnerData, images = {}) {
             type: 'application/json'
         }));
 
-        if (images.noticeImg1) formData.append("noticeImg1", images.noticeImg1);
-        if (images.noticeImg2) formData.append("noticeImg2", images.noticeImg2);
-        if (images.noticeImg3) formData.append("noticeImg3", images.noticeImg3);
+        ['noticeImg1', 'noticeImg2', 'noticeImg3'].forEach(imgField => {
+            if (images.hasOwnProperty(imgField)) { 
+                if (images[imgField] === null) {
+                    formData.append(imgField, new Blob([], { type: 'application/octet-stream' })); 
+                } else if (images[imgField] instanceof File) {
+                    // 새 파일이 있는 경우
+                    formData.append(imgField, images[imgField]);
+                }
+            }
+        });
 
         console.log('FormData 내용 확인:');
+        for (let pair of formData.entries()) {
+            console.log(pair[0]+ ', ' + pair[1]); 
+        }
 
         const response = await fetch(`${API_BASE_URL}/api/updatePartner`, {
             method: "POST",
