@@ -30,11 +30,8 @@ export async function getPartnerList() {
         }
 
         const partnerList = result.partnerList || [];
-        console.log('📋 partnerList 배열:', partnerList);
 
         return Array.isArray(partnerList) ? partnerList.map((item, idx) => {
-            console.log(`partner ${idx + 1} 데이터:`, item);
-            console.log('- updateTime:', item.updateTime);
             const mappedData = {
                 id: item.partnerId,
                 affiliateName: item.partnerName,
@@ -45,9 +42,9 @@ export async function getPartnerList() {
                 notice3: item.noticeDate3,
                 goalPerformance: item.targetValue,
                 lastUpdated: item.lastUpdated,
-                notice1Img: item.noticeImg1 ? { url: item.noticeImg1 } : null,
-                notice2Img: item.noticeImg2 ? { url: item.noticeImg2 } : null,
-                notice3Img: item.noticeImg3 ? { url: item.noticeImg3 } : null,
+                notice1Img: item.noticeImg1 ? { url: `${API_BASE_URL}${item.noticeImg1}` } : null,
+                notice2Img: item.noticeImg2 ? { url: `${API_BASE_URL}${item.noticeImg2}` } : null,
+                notice3Img: item.noticeImg3 ? { url: `${API_BASE_URL}${item.noticeImg3}` } : null,
             };
             return mappedData;
         }) : [];

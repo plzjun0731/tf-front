@@ -33,27 +33,28 @@ function AffiliateBusiness() {
         { key: 'nov', name: '11월'},
         { key: 'dec', name: '12월'},
     ];
+    const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
 
     // 컴포넌트 마운트 시 데이터 로드
     useEffect(() => {
         const loadData = async () => {
             try {
-                const partnerList = await getPartnerList();
+                const partnerList = await getPartnerList(currentYear);
                 setData(partnerList);
             } catch (error) {
                 alert("데이터 불러오기 실패: " + error.message);
             }
         };
         loadData();
-    }, []);
+    }, [currentYear]);
 
     const handleSubmit = async () => {
         if (formData.partnerName) {
             try {
-                await insertPartnerInfo(formData);
+                await insertPartnerInfo({ ...formData, year: currentYear });
                 
                 // 데이터 다시 로드
-                const updatedList = await getPartnerList();
+                const updatedList = await getPartnerList(currentYear);
                 setData(updatedList);
                 
                 // 폼 초기화
@@ -167,6 +168,7 @@ function AffiliateBusiness() {
                 noticeDate2: updatedData.notice2,
                 noticeDate3: updatedData.notice3,
                 targetValue: updatedData.goalPerformance,
+                year: currentYear,
             };
 
             const imagesToUpload = {};
@@ -192,7 +194,7 @@ function AffiliateBusiness() {
             alert('저장되었습니다.');
             
             // 데이터 다시 로드
-            const refreshedList = await getPartnerList();
+            const refreshedList = await getPartnerList(currentYear);
             setData(refreshedList);
             
             // 임시 데이터와 편집 상태 초기화
@@ -346,13 +348,6 @@ function AffiliateBusiness() {
             const imageField = field + "Img";
             const tempData = tempRowData[row.id] || {};
             const imageObj = tempData[imageField] !== undefined ? tempData[imageField] : row[imageField];
-            console.log(`${field} 이미지 디버깅:`, {
-                field,
-                imageField,
-                imageObj,
-                'imageObj?.url': imageObj?.url,
-                'row[imageField]': row[imageField]
-            });
 
             return (
                 <div className="date-image-container">
@@ -364,18 +359,8 @@ function AffiliateBusiness() {
                             <>
                                 <img 
                                     src={imageObj.url} 
-                                    className="notice-image"
-                                    onError={(e) => {
-                                        console.error('이미지 로드 실패:', {
-                                            url: imageObj.url,
-                                            error: e.target.error,
-                                            naturalWidth: e.target.naturalWidth,
-                                            naturalHeight: e.target.naturalHeight
-                                        });
-                                    }}
-                                    onLoad={() => {
-                                        console.log('이미지 로드 성공:', imageObj.url);
-                                    }} />
+                                    className="notice-image" 
+                                />
                                 <button className="image-delete-btn" onClick={() => handleImageDelete(row.id, imageField)}>
                                     <ImageOff size={16}/>
                                 </button>
