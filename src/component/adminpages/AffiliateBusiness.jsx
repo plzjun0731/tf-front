@@ -282,6 +282,7 @@ function AffiliateBusiness() {
                     }));
                 } else {
                     // 서버에 저장된 이미지면 즉시 삭제 요청
+                    const original = data.find(r => r.id === rowId);
                     const updateData = {
                         partnerId: rowId,
                         partnerName: original.affiliateName,
@@ -291,6 +292,7 @@ function AffiliateBusiness() {
                         noticeDate2: original.notice2,
                         noticeDate3: original.notice3,
                         targetValue: original.goalPerformance,
+                        year: currentYear,
                         // 삭제할 이미지 필드를 null로 설정
                         [field === 'notice1Img' ? 'noticeImg1' :
                         field === 'notice2Img' ? 'noticeImg2' : 
@@ -300,13 +302,13 @@ function AffiliateBusiness() {
                     await updatePartnerInfo(updateData);
                     
                     // 데이터 다시 로드
-                    const refreshedList = await getPartnerList();
+                    const refreshedList = await getPartnerList(currentYear);
                     setData(refreshedList);
                 }
             } catch (error) {
                 alert("이미지 삭제 실패: " + error.message);
                 // 에러 발생시 복구
-                const refreshedList = await getPartnerList();
+                const refreshedList = await getPartnerList(currentYear);
                 setData(refreshedList);
             }
         }
@@ -356,7 +358,7 @@ function AffiliateBusiness() {
                     </div>
                     <div className="image-actions">
                         {imageObj && imageObj.url ? (
-                            <>
+                            <a href={imageObj.url} target="_blank" rel="noopener noreferrer">
                                 <img 
                                     src={imageObj.url} 
                                     className="notice-image" 
@@ -364,7 +366,7 @@ function AffiliateBusiness() {
                                 <button className="image-delete-btn" onClick={() => handleImageDelete(row.id, imageField)}>
                                     <ImageOff size={16}/>
                                 </button>
-                            </>
+                            </a>
                         ) : null}
 
                         <input
