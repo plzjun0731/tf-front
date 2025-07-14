@@ -41,10 +41,20 @@ export async function getPartnerList() {
                 notice2: item.noticeDate2,
                 notice3: item.noticeDate3,
                 goalPerformance: item.targetValue,
-                lastUpdated: item.lastUpdated,
+                lastUpdated: item.lastUpdate,
                 notice1Img: item.noticeImg1 ? { url: `${API_BASE_URL}${item.noticeImg1}` } : null,
                 notice2Img: item.noticeImg2 ? { url: `${API_BASE_URL}${item.noticeImg2}` } : null,
                 notice3Img: item.noticeImg3 ? { url: `${API_BASE_URL}${item.noticeImg3}` } : null,
+
+                ...item.monthlyPerformances?.reduce((acc, monthlyItem) => {
+                    const monthKey = months[monthlyItem.performanceMonth - 1]?.key;
+                    if (monthKey) {
+                        acc[`${monthKey}_db`] = monthlyItem.monthlyDb;
+                        acc[`${monthKey}_exam`] = monthlyItem.monthlyTest;
+                        acc[`${monthKey}_surgery`] = monthlyItem.monthlySurgery;
+                    }
+                    return acc;
+                }, {})
             };
             return mappedData;
         }) : [];

@@ -121,30 +121,6 @@ function AffiliateBusiness() {
         reader.readAsDataURL(file);
     };
 
-    // 이미지 업로드 함수 (saveChanges 내부에서 호출)
-    const uploadImageToServer = async (rowId, imagesToUpload) => {
-        try {
-            const original = data.find(r => r.id === rowId);
-
-            const updateData = {
-                partnerId: rowId,
-                partnerName: original.affiliateName,
-                partnerUnit: original.unit,
-                partnerManager: original.manager,
-                noticeDate1: original.notice1,
-                noticeDate2: original.notice2,
-                noticeDate3: original.notice3,
-                targetValue: original.goalPerformance,
-            };
-
-            await updatePartnerInfo(updateData, imagesToUpload); // 이미지 파일들을 함께 보냄
-            return true; // 성공
-        } catch (error) {
-            console.error("이미지 서버 업로드 실패:", error);
-            throw new Error("이미지 서버 업로드 실패: " + error.message);
-        }
-    };
-
     const saveChanges = async (rowId) => {
         try {
             const original = data.find(r => r.id === rowId);
@@ -158,6 +134,24 @@ function AffiliateBusiness() {
                 ...(field ? { [field]: cellValue } : {}),
             };
 
+            const monthlyPerformancesToSend = [];
+            months.forEach((month, index) => {
+                const monthNumber = index + 1;
+                const monthlyDb = updatedData[`${month.key}_db`];
+                const monthlyTest = updatedData[`${month.key}_exam`];
+                const monthlySurgery = updatedData[`${month.key}_surgery`];
+
+                if (monthlyDb !== undefined || monthlyTest !== undefined || monthlySurgery !== undefined) {
+                    monthlyPerformancesToSend.push({
+                    performanceMonth: monthNumber, 
+                    monthlyDb: monthlyDb !== undefined ? Number(monthlyDb) : null, // 숫자로 변환, 없으면 null
+                    monthlyTest: monthlyTest !== undefined ? Number(monthlyTest) : null,
+                    monthlySurgery: monthlySurgery !== undefined ? Number(monthlySurgery) : null,
+                });
+            }
+
+            })
+
             // API 필드명으로 변환
             const updateData = {
                 partnerId: rowId,
@@ -170,6 +164,18 @@ function AffiliateBusiness() {
                 targetValue: updatedData.goalPerformance,
                 year: currentYear,
             };
+
+            months.forEach(month => {
+                if (updatedData[`${month.key}_db`] !== undefined) {
+                    updateData[`${month.key}_db`] = updatedData[`${month.key}_db`];
+                }
+                if (updatedData[`${month.key}_exam`] !== undefined) {
+                    updateData[`${month.key}_exam`] = updatedData[`${month.key}_exam`];
+                }
+                if (updatedData[`${month.key}_surgery`] !== undefined) {
+                    updateData[`${month.key}_surgery`] = updatedData[`${month.key}_surgery`];
+                }
+            })
 
             const imagesToUpload = {};
             const imageFields = ['notice1Img', 'notice2Img', 'notice3Img'];
@@ -207,6 +213,9 @@ function AffiliateBusiness() {
             setCellValue('');
         } catch (error) {
             alert("저장 실패: " + error.message);
+            // 복구
+            const refreshedList = await getPartnerList(currentYear);
+            setData(refreshedList);
         }
     };
 
@@ -282,7 +291,6 @@ function AffiliateBusiness() {
                     }));
                 } else {
                     // 서버에 저장된 이미지면 즉시 삭제 요청
-                    const original = data.find(r => r.id === rowId);
                     const updateData = {
                         partnerId: rowId,
                         partnerName: original.affiliateName,
