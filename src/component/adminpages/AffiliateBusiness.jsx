@@ -143,14 +143,13 @@ function AffiliateBusiness() {
 
                 if (monthlyDb !== undefined || monthlyTest !== undefined || monthlySurgery !== undefined) {
                     monthlyPerformancesToSend.push({
-                    performanceMonth: monthNumber, 
-                    monthlyDb: monthlyDb !== undefined ? Number(monthlyDb) : null, // 숫자로 변환, 없으면 null
-                    monthlyTest: monthlyTest !== undefined ? Number(monthlyTest) : null,
-                    monthlySurgery: monthlySurgery !== undefined ? Number(monthlySurgery) : null,
-                });
-            }
-
-            })
+                        performanceMonth: monthNumber, 
+                        monthlyDb: monthlyDb !== undefined ? Number(monthlyDb) : null, // 숫자로 변환, 없으면 null
+                        monthlyTest: monthlyTest !== undefined ? Number(monthlyTest) : null,
+                        monthlySurgery: monthlySurgery !== undefined ? Number(monthlySurgery) : null,
+                    });
+                }
+            });
 
             // API 필드명으로 변환
             const updateData = {
@@ -163,19 +162,8 @@ function AffiliateBusiness() {
                 noticeDate3: updatedData.notice3,
                 targetValue: updatedData.goalPerformance,
                 year: currentYear,
+                monthlyPerformances: monthlyPerformancesToSend,
             };
-
-            months.forEach(month => {
-                if (updatedData[`${month.key}_db`] !== undefined) {
-                    updateData[`${month.key}_db`] = updatedData[`${month.key}_db`];
-                }
-                if (updatedData[`${month.key}_exam`] !== undefined) {
-                    updateData[`${month.key}_exam`] = updatedData[`${month.key}_exam`];
-                }
-                if (updatedData[`${month.key}_surgery`] !== undefined) {
-                    updateData[`${month.key}_surgery`] = updatedData[`${month.key}_surgery`];
-                }
-            })
 
             const imagesToUpload = {};
             const imageFields = ['notice1Img', 'notice2Img', 'notice3Img'];
