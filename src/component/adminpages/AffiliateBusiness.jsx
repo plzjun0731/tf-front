@@ -1,21 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { ImagePlus, PencilLine, X, Check, ImageOff } from "lucide-react";
-import { insertPartnerInfo, getPartnerList, updatePartnerInfo, deletePartnerInfo } from "../../services/AffiliateBusinessApi";
-import "../styles/AffiliateBusiness.css";
+import { getPartnerList, insertPartnerInfo, updatePartnerInfo, deletePartnerInfo } from "../../services/AffiliateBusinessApi";
+import '../styles/AffiliateBusiness.css'
 
 function AffiliateBusiness() {
     const [data, setData] = useState([]);
     const [showMonthly, setShowMonthly] = useState(false);
     const [formData, setFormData] = useState({
-        affiliateName: '',
-        unit: '',
-        manager: '',
-        notice1: '',
-        notice2: '',
-        notice3: '',
-        goalPerformance: '' 
+        partnerName: '',
+        partnerUnit: '',
+        partnerManager: '',
+        noticeDate1: '',
+        noticeDate2: '',
+        noticeDate3: '',
+        targetValue: ''
     });
-    const [imageFiles, setImageFiles] = useState({});
     const [selectedCell, setSelectedCell] = useState(null);
     const [cellValue, setCellValue] = useState('');
     const [tempRowData, setTempRowData] = useState({});
@@ -35,13 +34,14 @@ function AffiliateBusiness() {
         { key: 'dec', name: '12월'},
     ];
 
+    // 컴포넌트 마운트 시 데이터 로드
     useEffect(() => {
         const loadData = async () => {
             try {
-                const data = await getPartnerList();
-                setData(data);
+                const partnerList = await getPartnerList();
+                setData(partnerList);
             } catch (error) {
-                console.error('데이터 로드 실패:', error);
+                alert("데이터 불러오기 실패: " + error.message);
             }
         };
         loadData();
@@ -52,69 +52,31 @@ function AffiliateBusiness() {
         return now.toISOString().split('T')[0].replace(/-/g, '.');
     }
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-
-        const sendData = {
-            partnerName: formData.affiliateName,
-            partnerUnit: formData.unit,
-            partnerManager: formData.manager,
-            noticeDate1: formData.notice1,
-            noticeDate2: formData.notice2,
-            noticeDate3: formData.notice3,
-            targetValue: formData.goalPerformance
+    const handleSubmit = async () => {
+        if (formData.partnerName) {
+            try {
+                await insertPartnerInfo(formData);
+                
+                // 데이터 다시 로드
+                const updatedList = await getPartnerList();
+                setData(updatedList);
+                
+                // 폼 초기화
+                setFormData({
+                    partnerName: '',
+                    partnerUnit: '',
+                    partnerManager: '',
+                    noticeDate1: '',
+                    noticeDate2: '',
+                    noticeDate3: '',
+                    targetValue: ''
+                });
+                
+                alert("등록되었습니다.");
+            } catch (error) {
+                alert("등록 실패: " + error.message);
+            }
         }
-
-        try {
-            await insertPartnerInfo(sendData);
-
-            const updatedList = await getPartnerList();
-
-            setData(updatedList);
-            setFormData({
-                affiliateName: '',
-                unit: '',
-                manager: '',
-                notice1: '',
-                notice2: '',
-                notice3: '',
-                goalPerformance: ''
-            });
-            alert("제휴처가 등록되었습니다.");
-        } catch (error) {
-            alert("제휴처 등록 중 오류가 발생했습니다.");
-            console.log(error);
-        }
-        // if (formData.affiliateName) {
-        //     const currentDate = getCurrentDate();
-        //     const monthlyData = {};
-        //     months.forEach(month => {
-        //         monthlyData[`${month.key}_db`] = '';
-        //         monthlyData[`${month.key}_exam`] = '';
-        //         monthlyData[`${month.key}_surgery`] = '';
-        //     })
-        //     setData([
-        //         ...data,
-        //         {
-        //             ...formData,
-        //             ...monthlyData,
-        //             id: Date.now(),
-        //             notice1Image: null,
-        //             notice2Image: null,
-        //             notice3Image: null,
-        //             lastUpdated: currentDate
-        //         }
-        //     ]);
-        //     setFormData({
-        //         affiliateName: '',
-        //         unit: '',
-        //         manager: '',
-        //         notice1: '',
-        //         notice2: '',
-        //         notice3: '',
-        //         goalPerformance: ''
-        //     });
-        // }
     };
 
     const handleInputChange = (e) => {
@@ -127,81 +89,51 @@ function AffiliateBusiness() {
     const handleCellClick = (rowId, field, currentValue) => {
         setSelectedCell({ rowId, field });
         const tempData = tempRowData[rowId] || {};
-        const valueToSet = tempData[field] !== undefined ? tempData[field] : (currentValue || '');
-        setCellValue(valueToSet);
+        setCellValue(tempData[field] !== undefined ? tempData[field] : currentValue);
     };
 
     const saveChanges = async (rowId) => {
-        console.log('saveChanges 호출됨:', { rowId, selectedCell });
-        const { field } = selectedCell || {};
-
-        if (!field) { 
-            console.log('편집 중인 필드가 없음');
-            return;
-        }
-
         try {
-            const currentRow = data.find(row => row.id === rowId);
-            if (!currentRow) {
-                alert('데이터를 찾을 수 없습니다.');
-                return;
-            }
-            console.log('현재 행 데이터:', currentRow);
-            console.log('수정한 값:', cellValue);
-
-            const tempData = tempRowData[rowId] || {};
-                
-            const partnerData = {
-                partnerId: currentRow.id,
-                partnerName: tempData.affiliateName !== undefined ? tempData.affiliateName : currentRow.affiliateName,
-                partnerUnit: tempData.unit !== undefined ? tempData.unit : currentRow.unit,
-                partnerManager: tempData.manager !== undefined ? tempData.manager : currentRow.manager,
-                noticeDate1: tempData.notice1 !== undefined ? tempData.notice1 : currentRow.notice1,
-                noticeDate2: tempData.notice2 !== undefined ? tempData.notice2 : currentRow.notice2,
-                noticeDate3: tempData.notice3 !== undefined ? tempData.notice3 : currentRow.notice3,
-                targetValue: tempData.goalPerformance !== undefined ? tempData.goalPerformance : currentRow.goalPerformance,
+            const original = data.find(r => r.id === rowId);
+            const { field } = selectedCell || {};
+            
+            // 현재 편집 중인 필드 값과 임시 데이터 합치기
+            const updatedData = {
+                ...original,
+                ...tempRowData[rowId],
+                ...(field ? { [field]: cellValue } : {}),
             };
 
-            if (field === 'affiliateName') {
-                partnerData.partnerName = cellValue;
-            } else if (field === 'unit') {
-                partnerData.partnerUnit = cellValue;
-            } else if (field === 'manager') {
-                partnerData.partnerManager = cellValue;
-            } else if (field === 'goalPerformance') {
-                partnerData.targetValue = cellValue;
-            } else if (field === 'notice1') {
-                partnerData.noticeDate1 = cellValue;
-            } else if (field === 'notice2') {
-                partnerData.noticeDate2 = cellValue;
-            } else if (field === 'notice3') {
-                partnerData.noticeDate3 = cellValue;
-            }
+            // API 필드명으로 변환
+            const updateData = {
+                partnerId: rowId,
+                partnerName: updatedData.affiliateName,
+                partnerUnit: updatedData.unit,
+                partnerManager: updatedData.manager,
+                noticeDate1: updatedData.notice1,
+                noticeDate2: updatedData.notice2,
+                noticeDate3: updatedData.notice3,
+                targetValue: updatedData.goalPerformance,
+            };
 
-            const images = imageFiles[rowId] || {};
-            console.log('전송할 데이터:', partnerData);
-            console.log('전송할 이미지:', images);
-
-            await updatePartnerInfo(partnerData, images);
-
-            const updatedList = await getPartnerList();
-            setData(updatedList);
+            await updatePartnerInfo(updateData);
+            alert('저장되었습니다.');
+            
+            // 데이터 다시 로드
+            const refreshedList = await getPartnerList();
+            setData(refreshedList);
+            
+            // 임시 데이터와 편집 상태 초기화
             setTempRowData(prev => {
                 const updated = { ...prev };
                 delete updated[rowId];
                 return updated;
             });
-
             setSelectedCell(null);
             setCellValue('');
-
-            alert('저장되었습니다.');
-
         } catch (error) {
-            alert('저장에 실패했습니다. 다시 시도해 주세요.');
-            console.error(error);
+            alert("저장 실패: " + error.message);
         }
-               
     };
 
     const handleCellSave = () => {
@@ -228,83 +160,92 @@ function AffiliateBusiness() {
         if (window.confirm("정말로 삭제하시겠습니까?")) {
             try {
                 await deletePartnerInfo(rowId);
-
-                const updatedList = await getPartnerList();
-                setData(updatedList);
-
+                alert("삭제되었습니다.");
+                
+                // 데이터 다시 로드
+                const refreshedList = await getPartnerList();
+                setData(refreshedList);
+                
+                // 관련 상태 초기화
                 setTempRowData(prev => {
                     const newData = { ...prev };
                     delete newData[rowId];
                     return newData;
                 });
-
-                setImageFiles(prev => {
-                    const newData = { ...prev };
-                    delete newData[rowId];
-                    return newData;
-                });
-
                 if (selectedCell && selectedCell.rowId === rowId) {
                     setSelectedCell(null);
                     setCellValue('');
                 }
-
-                alert('삭제되었습니다.');
             } catch (error) {
-                alert('삭제에 실패했습니다. 다시 시도해 주세요.');
-                console.error(error);
+                alert("삭제 실패: " + error.message);
             }
         }
     };
 
-    const handleImageUpload = (rowId, field, files) => {
+    const handleImageUpload = async (rowId, field, files) => {
         if (files && files.length > 0) {
-            const file = files[0];
-            const reader = new FileReader();
+            try {
+                const file = files[0];
+                const original = data.find(r => r.id === rowId);
+                
+                const updateData = {
+                    partnerId: rowId,
+                    partnerName: original.affiliateName,
+                    partnerUnit: original.unit,
+                    partnerManager: original.manager,
+                    noticeDate1: original.notice1,
+                    noticeDate2: original.notice2,
+                    noticeDate3: original.notice3,
+                    targetValue: original.goalPerformance,
+                };
 
-            reader.onload = (e) => {
-                const newImage = { url: e.target.result };
+                // 이미지 필드명 매핑
+                const imageMapping = {
+                    'notice1Image': 'notice1Img',
+                    'notice2Image': 'notice2Img', 
+                    'notice3Image': 'notice3Img'
+                };
 
-                setData(prev =>
-                    prev.map(row =>
-                        row.id === rowId
-                            ? { ...row, [field]: newImage, lastUpdated: getCurrentDate() }
-                            : row
-                    )
-                );
-            };
-            reader.readAsDataURL(file);
-            setImageFiles(prev => ({
-                ...prev,
-                [rowId]: {
-                    ...prev[rowId],
-                    [field]: file 
-                }
-            }));
+                const images = {
+                    [imageMapping[field]]: file
+                };
+
+                await updatePartnerInfo(updateData, images);
+                
+                // 데이터 다시 로드
+                const refreshedList = await getPartnerList();
+                setData(refreshedList);
+            } catch (error) {
+                alert("이미지 업로드 실패: " + error.message);
+            }
         }
     };
 
-    const handleImageDelete = (rowId, field) => {
+    const handleImageDelete = async (rowId, field) => {
         if (window.confirm("정말로 삭제하시겠습니까?")) {
-            setData(prev =>
-                prev.map(row =>
-                    row.id === rowId
-                        ? { ...row, [field]: null, lastUpdated: getCurrentDate() }
-                        : row
-                )
-            );
+            try {
+                const original = data.find(r => r.id === rowId);
+                
+                const updateData = {
+                    partnerId: rowId,
+                    partnerName: original.affiliateName,
+                    partnerUnit: original.unit,
+                    partnerManager: original.manager,
+                    noticeDate1: original.notice1,
+                    noticeDate2: original.notice2,
+                    noticeDate3: original.notice3,
+                    targetValue: original.goalPerformance,
+                    [field]: null // 이미지 필드를 null로 설정
+                };
 
-            setImageFiles(prev => {
-                const updated = { ...prev };
-                if (updated[rowId]) {
-                    delete updated[rowId][field];
-                    if (Object.keys(updated[rowId]).length === 0) {
-                        delete updated[rowId];
-                    }
-                }
-                return updated;
-            });
-            console.log('이미지 삭제:', { rowId, field });
+                await updatePartnerInfo(updateData);
+                
+                // 데이터 다시 로드
+                const refreshedList = await getPartnerList();
+                setData(refreshedList);
+            } catch (error) {
+                alert("이미지 삭제 실패: " + error.message);
+            }
         }
     };
 
@@ -317,46 +258,23 @@ function AffiliateBusiness() {
     const renderCell = (row, field) => {
         const isEditing = selectedCell?.rowId === row.id && selectedCell?.field === field;
         const tempData = tempRowData[row.id] || {};
-        const displayValue = tempData[field] !== undefined ? tempData[field] : (row[field] || '');
+        const displayValue = tempData[field] !== undefined ? tempData[field] : row[field];
 
         if (isEditing && !isImageField(field)) {
             return (
-                <div style={{ display: "flex", alignItems: "center", gap: "2px" }}>
+                <div className="cell-editing">
                     <input
+                        className="cell-input"
                         type={isDateField(field) ? "date" : isNumberField(field) ? "number" : "text"}
-                        value={cellValue || ''}
+                        value={cellValue}
                         onChange={(e) => setCellValue(e.target.value)}
                         autoFocus
-                        onKeyDown={(e) => {
-                            if (e.key === 'Enter') {
-                                e.preventDefault();
-                                saveChanges(row.id);
-                            } 
-                        }}
-                        style={{ width: isNumberField(field) ? "80px" : "auto" }}
+                        onKeyDown={(e) => e.key === 'Enter' && saveChanges(row.id)}
                     />
-                    <button 
-                        onClick={cancelEdit} 
-                        title="변경취소"
-                        style={{ 
-                            cursor: "pointer", 
-                            background: "none", 
-                            border: "none", 
-                            padding: "2px"
-                        }}
-                    >
+                    <button className="cell-edit-btn" onClick={cancelEdit}>
                         <X size={15}/>
                     </button>
-                    <button 
-                        onClick={handleCellSave} 
-                        title="변경"
-                        style={{ 
-                            cursor: "pointer", 
-                            background: "none", 
-                            border: "none", 
-                            padding: "2px"
-                        }}
-                    >
+                    <button className="cell-edit-btn" onClick={handleCellSave}>
                         <Check size={15}/>
                     </button>
                 </div>
@@ -368,21 +286,17 @@ function AffiliateBusiness() {
             const imageObj = row[imageField];
 
             return (
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "2px" }}>
-                    <div onClick={() => handleCellClick(row.id, field, row[field])} title="수정" style={{ cursor: "pointer"}}>
+                <div className="date-image-container">
+                    <div onClick={() => handleCellClick(row.id, field, row[field])} className="cell-display">
                         {displayValue || <PencilLine size={16} />}
                     </div>
-                    <div style={{ display: "flex", alignItems: "center", gap: "2px"}}>
+                    <div className="image-actions">
                         {imageObj ? (
                             <>
-                                <img src={imageObj.url} width={100} height={100} />
-                                <div
-                                    onClick={() => handleImageDelete(row.id, imageField)}
-                                    style={{ cursor: "pointer"}}
-                                    title="이미지 삭제"
-                                >
+                                <img src={imageObj.url} alt="공지이미지" className="notice-image" />
+                                <button className="image-delete-btn" onClick={() => handleImageDelete(row.id, imageField)}>
                                     <ImageOff size={16}/>
-                                </div>
+                                </button>
                             </>
                         ) : null}
 
@@ -394,7 +308,7 @@ function AffiliateBusiness() {
                             onChange={(e) => handleImageUpload(row.id, imageField, e.target.files)}
                         />
                         {!imageObj && (
-                            <label htmlFor={`edit-${row.id}-${imageField}`} title="이미지 추가" style={{ cursor: "pointer" }}>
+                            <label htmlFor={`edit-${row.id}-${imageField}`} className="image-upload-label">
                                 <ImagePlus size={16} />
                             </label>
                         )}
@@ -404,9 +318,7 @@ function AffiliateBusiness() {
         }
 
         return (
-            <div onClick={() => handleCellClick(row.id, field, row[field])} 
-                title="수정" 
-                style={{ cursor: "pointer" }}>
+            <div onClick={() => handleCellClick(row.id, field, row[field])} className="cell-display">
                 {displayValue || <PencilLine size={16} />}
             </div>
         );
@@ -426,9 +338,9 @@ function AffiliateBusiness() {
                 <label>제휴처명:
                     <input
                         type="text"
-                        name="affiliateName"
+                        name="partnerName"
                         className="input"
-                        value={formData.affiliateName}
+                        value={formData.partnerName}
                         onChange={handleInputChange}
                         required
                     />
@@ -436,60 +348,60 @@ function AffiliateBusiness() {
                 <label>단위:
                     <input
                         type="text"
-                        name="unit"
+                        name="partnerUnit"
                         className="input"
-                        value={formData.unit}
+                        value={formData.partnerUnit}
                         onChange={handleInputChange}
                     />
                 </label>
                 <label>담당자:
                     <input
                         type="text"
-                        name="manager"
+                        name="partnerManager"
                         className="input"
-                        value={formData.manager}
+                        value={formData.partnerManager}
                         onChange={handleInputChange}
                     />
                 </label>
                 <label>목표실적:
                     <input
                         type="number"
-                        name="goalPerformance"
+                        name="targetValue"
                         className="input"
-                        value={formData.goalPerformance}
+                        value={formData.targetValue}
                         onChange={handleInputChange}
                     />
                 </label>
                 <label>공지 1차:
                     <input
                         type="date"
-                        name="notice1"
+                        name="noticeDate1"
                         className="input"
-                        value={formData.notice1}
+                        value={formData.noticeDate1}
                         onChange={handleInputChange}
                     />
                 </label>
                 <label>공지 2차:
                     <input
                         type="date"
-                        name="notice2"
+                        name="noticeDate2"
                         className="input"
-                        value={formData.notice2}
+                        value={formData.noticeDate2}
                         onChange={handleInputChange}
                     />
                 </label>
                 <label>공지 3차:
                     <input
                         type="date"
-                        name="notice3"
+                        name="noticeDate3"
                         className="input"
-                        value={formData.notice3}
+                        value={formData.noticeDate3}
                         onChange={handleInputChange}
                     />
                 </label>
                 <button className="button" onClick={handleSubmit}>입력</button>
             </div>
-            <div className="table-scroll" style={{ overflowX: "auto" }}>
+            <div className="table-scroll">
                 <table className="table" style={{ minWidth: showMonthly ? "4000px" : "1800px", tableLayout: "fixed" }}>
                     <thead>
                         <tr>
@@ -500,9 +412,9 @@ function AffiliateBusiness() {
                             <th style={{ width: "300px" }}>공지 2차</th>
                             <th style={{ width: "300px" }}>공지 3차</th>
                             <th style={{ width: "100px" }}>
-                                <div onClick={() => setShowMonthly(!showMonthly)} style={{ cursor: "pointer" }}>
+                                <button className="button monthly-toggle-btn" onClick={() => setShowMonthly(!showMonthly)}>
                                     {showMonthly ? "월별 ◀" : "월별 ▶"}
-                                </div>
+                                </button>
                             </th>
                             {showMonthly && months.map(month => (
                                 <th key={month.key}>
@@ -532,15 +444,15 @@ function AffiliateBusiness() {
                                 <td>{renderCell(row, "notice3")}</td>
                                 <td style={{ minWidth: "80px" }}></td>
                                 {showMonthly && months.map(month => (
-                                    <td key={month.key} style={{ padding: "0", border: "1px solid #ccc" }}>
-                                        <div style={{ display: "flex", height: "100%" }}>
-                                            <div style={{ flex: 1, borderRight: "1px solid #ccc", padding: "8px 6px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                                    <td key={month.key} className="monthly-td">
+                                        <div className="monthly-cell">
+                                            <div className="monthly-subcell">
                                                 {renderCell(row, `${month.key}_db`)}
                                             </div>
-                                            <div style={{ flex: 1, borderRight: "1px solid #ccc", padding: "8px 6px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                                            <div className="monthly-subcell">
                                                 {renderCell(row, `${month.key}_exam`)}
                                             </div>
-                                            <div style={{ flex: 1, padding: "8px 6px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                                            <div className="monthly-subcell">
                                                 {renderCell(row, `${month.key}_surgery`)}
                                             </div>
                                         </div>
@@ -549,26 +461,12 @@ function AffiliateBusiness() {
                                 <td>{renderCell(row, "goalPerformance")}</td>
                                 <td>{row.lastUpdated || getCurrentDate()}</td>
                                 <td>
-                                    <button 
-                                        className="button"
-                                        onClick={() => saveChanges(row.id)}
-                                        style={{ 
-                                            padding: "6px 11px",
-                                            cursor: "pointer", 
-                                        }}
-                                    >
+                                    <button className="button" onClick={() => saveChanges(row.id)}>
                                         저장
                                     </button>
                                 </td>
                                 <td>
-                                    <button
-                                        className="button"
-                                        onClick={() => deleteRow(row.id)}
-                                        style={{ 
-                                            padding: "6px 11px",
-                                            cursor: "pointer", 
-                                        }}
-                                    >
+                                    <button className="button" onClick={() => deleteRow(row.id)}>
                                         삭제
                                     </button>
                                 </td>

@@ -96,10 +96,7 @@ export async function updatePartnerInfo(partnerData, images = {}) {
         if (images.notice2Img) formData.append("noticeImg2", images.notice2Img);
         if (images.notice3Img) formData.append("noticeImg3", images.notice3Img);
 
-        console.log('FormData 내용 확인:'); 
-        for (let [key, value] of formData.entries()) {
-            console.log(key, value);
-        }
+        console.log('FormData 내용 확인:');
 
         const response = await fetch(`${API_BASE_URL}/api/updatePartner`, {
             method: "POST",
