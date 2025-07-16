@@ -44,11 +44,11 @@ export async function getNoticeList() {
     }
 }
 
-export async function writeNotice(formData) {
+export async function insertNotice(formData) {
     try {
         console.log('공지사항 등록 요청:', formData);
         
-        const response = await fetch(`${API_BASE_URL}/api/writeNotice`, {
+        const response = await fetch(`${API_BASE_URL}/api/insertNotice`, {
             method: "POST",
             credentials: "include",
             body: formData,

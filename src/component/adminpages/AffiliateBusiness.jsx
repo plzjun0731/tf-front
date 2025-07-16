@@ -33,32 +33,28 @@ function AffiliateBusiness() {
         { key: 'nov', name: '11월'},
         { key: 'dec', name: '12월'},
     ];
+    const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
 
     // 컴포넌트 마운트 시 데이터 로드
     useEffect(() => {
         const loadData = async () => {
             try {
-                const partnerList = await getPartnerList();
+                const partnerList = await getPartnerList(currentYear);
                 setData(partnerList);
             } catch (error) {
                 alert("데이터 불러오기 실패: " + error.message);
             }
         };
         loadData();
-    }, []);
-
-    const getCurrentDate = () => {
-        const now = new Date();
-        return now.toISOString();
-    }
+    }, [currentYear]);
 
     const handleSubmit = async () => {
         if (formData.partnerName) {
             try {
-                await insertPartnerInfo(formData);
+                await insertPartnerInfo({ ...formData, year: currentYear });
                 
                 // 데이터 다시 로드
-                const updatedList = await getPartnerList();
+                const updatedList = await getPartnerList(currentYear);
                 setData(updatedList);
                 
                 // 폼 초기화
@@ -92,17 +88,68 @@ function AffiliateBusiness() {
         setCellValue(tempData[field] !== undefined ? tempData[field] : currentValue);
     };
 
+    const handleImageUpload = (rowId, field, file) => {
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const previewImage = {
+                url: e.target.result,
+                name: file.name,
+                file: file, // 실제 파일 객체 저장
+                isPreview: true // 미리보기 상태 표시
+            };
+
+            // UI에 미리보기 즉시 반영
+            setData(prev =>
+                prev.map(row =>
+                    row.id === rowId
+                        ? { ...row, [field]: previewImage }
+                        : row
+                )
+            );
+
+            // tempRowData에 파일 객체와 미리보기 정보 저장
+            setTempRowData(prev => ({
+                ...prev,
+                [rowId]: {
+                    ...prev[rowId],
+                    [field]: previewImage
+                }
+            }));
+        };
+        reader.readAsDataURL(file);
+    };
+
     const saveChanges = async (rowId) => {
         try {
             const original = data.find(r => r.id === rowId);
             const { field } = selectedCell || {};
+            const tempData = tempRowData[rowId] || {};
             
             // 현재 편집 중인 필드 값과 임시 데이터 합치기
             const updatedData = {
                 ...original,
-                ...tempRowData[rowId],
+                ...tempData,
                 ...(field ? { [field]: cellValue } : {}),
             };
+
+            const monthlyPerformancesToSend = [];
+            months.forEach((month, index) => {
+                const monthNumber = index + 1;
+                const monthlyDb = updatedData[`${month.key}_db`];
+                const monthlyTest = updatedData[`${month.key}_exam`];
+                const monthlySurgery = updatedData[`${month.key}_surgery`];
+
+                if (monthlyDb !== undefined || monthlyTest !== undefined || monthlySurgery !== undefined) {
+                    monthlyPerformancesToSend.push({
+                        performanceMonth: monthNumber, 
+                        monthlyDb: monthlyDb !== undefined ? Number(monthlyDb) : null, // 숫자로 변환, 없으면 null
+                        monthlyTest: monthlyTest !== undefined ? Number(monthlyTest) : null,
+                        monthlySurgery: monthlySurgery !== undefined ? Number(monthlySurgery) : null,
+                    });
+                }
+            });
 
             // API 필드명으로 변환
             const updateData = {
@@ -114,14 +161,34 @@ function AffiliateBusiness() {
                 noticeDate2: updatedData.notice2,
                 noticeDate3: updatedData.notice3,
                 targetValue: updatedData.goalPerformance,
-                lastUpdated: getCurrentDate()
+                year: currentYear,
+                monthlyPerformances: monthlyPerformancesToSend,
             };
 
-            await updatePartnerInfo(updateData);
+            const imagesToUpload = {};
+            const imageFields = ['notice1Img', 'notice2Img', 'notice3Img'];
+            const serverFieldMap = {
+                'notice1Img': 'noticeImg1',
+                'notice2Img': 'noticeImg2', 
+                'notice3Img': 'noticeImg3'
+            };
+
+            for (const imageField of imageFields) {
+                const imageData = tempData[imageField];
+                if (imageData && imageData.file && imageData.isPreview) {
+                    // 새로 업로드된 파일이 있으면 추가
+                    imagesToUpload[serverFieldMap[imageField]] = imageData.file;
+                } else if (imageData === null) {
+                    // 이미지가 명시적으로 삭제된 경우 (null로 설정)
+                    imagesToUpload[serverFieldMap[imageField]] = null; 
+                }
+            }
+
+            await updatePartnerInfo(updateData, imagesToUpload);
             alert('저장되었습니다.');
             
             // 데이터 다시 로드
-            const refreshedList = await getPartnerList();
+            const refreshedList = await getPartnerList(currentYear);
             setData(refreshedList);
             
             // 임시 데이터와 편집 상태 초기화
@@ -134,6 +201,9 @@ function AffiliateBusiness() {
             setCellValue('');
         } catch (error) {
             alert("저장 실패: " + error.message);
+            // 복구
+            const refreshedList = await getPartnerList(currentYear);
+            setData(refreshedList);
         }
     };
 
@@ -183,66 +253,14 @@ function AffiliateBusiness() {
         }
     };
 
-    const handleImageUpload = async (rowId, field, files) => {
-        if (files && files.length > 0) {
+    const handleImageDelete = async (rowId, field) => {
+        if (window.confirm("정말로 삭제하시겠습니까?")) {
             try {
-                const file = files[0];
-                
-                // 즉시 미리보기 표시 (로컬 URL 생성)
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    const previewImage = {
-                        url: e.target.result,
-                        name: file.name,
-                        isPreview: true // 미리보기임을 표시
-                    };
+                const tempData = tempRowData[rowId] || {};
+                const imageData = tempData[field];
+                const currentDataRow = data.find(r => r.id == rowId);
+                const original = currentDataRow;
 
-                    // 즉시 화면에 미리보기 표시
-                    setData(prev =>
-                        prev.map(row =>
-                            row.id === rowId
-                                ? { ...row, [field]: previewImage }
-                                : row
-                        )
-                    );
-                };
-                reader.readAsDataURL(file);
-
-                // 백그라운드에서 서버에 업로드
-                const original = data.find(r => r.id === rowId);
-                
-                const updateData = {
-                    partnerId: rowId,
-                    partnerName: original.affiliateName,
-                    partnerUnit: original.unit,
-                    partnerManager: original.manager,
-                    noticeDate1: original.notice1,
-                    noticeDate2: original.notice2,
-                    noticeDate3: original.notice3,
-                    targetValue: original.goalPerformance,
-                    lastUpdated: getCurrentDate()
-                };
-
-                // 이미지 필드명 매핑
-                const imageMapping = {
-                    'notice1Image': 'notice1Img',
-                    'notice2Image': 'notice2Img', 
-                    'notice3Image': 'notice3Img'
-                };
-
-                const images = {
-                    [imageMapping[field]]: file
-                };
-
-                await updatePartnerInfo(updateData, images);
-                
-                // 서버 업로드 완료 후 실제 URL로 교체
-                const refreshedList = await getPartnerList();
-                setData(refreshedList);
-                
-            } catch (error) {
-                alert("이미지 업로드 실패: " + error.message);
-                // 에러 시 미리보기 제거
                 setData(prev =>
                     prev.map(row =>
                         row.id === rowId
@@ -250,35 +268,44 @@ function AffiliateBusiness() {
                             : row
                     )
                 );
-            }
-        }
-    };
 
-    const handleImageDelete = async (rowId, field) => {
-        if (window.confirm("정말로 삭제하시겠습니까?")) {
-            try {
-                const original = data.find(r => r.id === rowId);
-                
-                const updateData = {
-                    partnerId: rowId,
-                    partnerName: original.affiliateName,
-                    partnerUnit: original.unit,
-                    partnerManager: original.manager,
-                    noticeDate1: original.notice1,
-                    noticeDate2: original.notice2,
-                    noticeDate3: original.notice3,
-                    targetValue: original.goalPerformance,
-                    lastUpdated: getCurrentDate(),
-                    [field]: null // 이미지 필드를 null로 설정
-                };
+                if (imageData && imageData.isPreview) {
+                    setTempRowData(prev => ({
+                        ...prev,
+                        [rowId]: {
+                            ...prev[rowId],
+                            [field]: null
+                        }
+                    }));
+                } else {
+                    // 서버에 저장된 이미지면 즉시 삭제 요청
+                    const updateData = {
+                        partnerId: rowId,
+                        partnerName: original.affiliateName,
+                        partnerUnit: original.unit,
+                        partnerManager: original.manager,
+                        noticeDate1: original.notice1,
+                        noticeDate2: original.notice2,
+                        noticeDate3: original.notice3,
+                        targetValue: original.goalPerformance,
+                        year: currentYear,
+                        // 삭제할 이미지 필드를 null로 설정
+                        [field === 'notice1Img' ? 'noticeImg1' :
+                        field === 'notice2Img' ? 'noticeImg2' : 
+                        'noticeImg3']: null 
+                    };
 
-                await updatePartnerInfo(updateData);
-                
-                // 데이터 다시 로드
-                const refreshedList = await getPartnerList();
-                setData(refreshedList);
+                    await updatePartnerInfo(updateData);
+                    
+                    // 데이터 다시 로드
+                    const refreshedList = await getPartnerList(currentYear);
+                    setData(refreshedList);
+                }
             } catch (error) {
                 alert("이미지 삭제 실패: " + error.message);
+                // 에러 발생시 복구
+                const refreshedList = await getPartnerList(currentYear);
+                setData(refreshedList);
             }
         }
     };
@@ -317,7 +344,8 @@ function AffiliateBusiness() {
 
         if (isDateField(field)) {
             const imageField = field + "Img";
-            const imageObj = row[imageField];
+            const tempData = tempRowData[row.id] || {};
+            const imageObj = tempData[imageField] !== undefined ? tempData[imageField] : row[imageField];
 
             return (
                 <div className="date-image-container">
@@ -326,12 +354,15 @@ function AffiliateBusiness() {
                     </div>
                     <div className="image-actions">
                         {imageObj && imageObj.url ? (
-                            <>
-                                <img src={imageObj.url} alt="공지이미지" className="notice-image" />
+                            <a href={imageObj.url} target="_blank" rel="noopener noreferrer">
+                                <img 
+                                    src={imageObj.url} 
+                                    className="notice-image" 
+                                />
                                 <button className="image-delete-btn" onClick={() => handleImageDelete(row.id, imageField)}>
                                     <ImageOff size={16}/>
                                 </button>
-                            </>
+                            </a>
                         ) : null}
 
                         <input
@@ -339,9 +370,9 @@ function AffiliateBusiness() {
                             accept="image/*"
                             id={`edit-${row.id}-${imageField}`}
                             style={{ display: "none" }}
-                            onChange={(e) => handleImageUpload(row.id, imageField, e.target.files)}
+                            onChange={(e) => handleImageUpload(row.id, imageField, e.target.files[0])}
                         />
-                        {!imageObj && (
+                        {!imageObj?.url && (
                             <label htmlFor={`edit-${row.id}-${imageField}`} className="image-upload-label">
                                 <ImagePlus size={16} />
                             </label>
@@ -493,7 +524,7 @@ function AffiliateBusiness() {
                                     </td>
                                 ))}
                                 <td>{renderCell(row, "goalPerformance")}</td>
-                                <td>{row.lastUpdated ? new Date(row.lastUpdated).toLocaleDateString('ko-KR') : ''}</td>
+                                <td>{row.lastUpdated ? row.lastUpdated.split(' ')[0] : ''}</td>
                                 <td>
                                     <button className="button" onClick={() => saveChanges(row.id)}>
                                         저장

@@ -31,20 +31,33 @@ export async function getPartnerList() {
 
         const partnerList = result.partnerList || [];
 
-        return Array.isArray(partnerList) ? partnerList.map((item, idx) => ({
-            id: item.partnerId,
-            affiliateName: item.partnerName,
-            unit: item.partnerUnit,
-            manager: item.partnerManager,
-            notice1: item.noticeDate1,
-            notice2: item.noticeDate2,
-            notice3: item.noticeDate3,
-            goalPerformance: item.targetValue,
-            lastUpdated: item.lastUpdated,
-            notice1Img: item.noticeImg1 ? { url: item.noticeImg1 } : null,
-            notice2Img: item.noticeImg2 ? { url: item.noticeImg2 } : null,
-            notice3Img: item.noticeImg3 ? { url: item.noticeImg3 } : null,
-        })) : [];
+        return Array.isArray(partnerList) ? partnerList.map((item, idx) => {
+            const mappedData = {
+                id: item.partnerId,
+                affiliateName: item.partnerName,
+                unit: item.partnerUnit,
+                manager: item.partnerManager,
+                notice1: item.noticeDate1,
+                notice2: item.noticeDate2,
+                notice3: item.noticeDate3,
+                goalPerformance: item.targetValue,
+                lastUpdated: item.lastUpdate,
+                notice1Img: item.noticeImg1 ? { url: `${API_BASE_URL}${item.noticeImg1}` } : null,
+                notice2Img: item.noticeImg2 ? { url: `${API_BASE_URL}${item.noticeImg2}` } : null,
+                notice3Img: item.noticeImg3 ? { url: `${API_BASE_URL}${item.noticeImg3}` } : null,
+
+                ...item.monthlyPerformances?.reduce((acc, monthlyItem) => {
+                    const monthKey = months[monthlyItem.performanceMonth - 1]?.key;
+                    if (monthKey) {
+                        acc[`${monthKey}_db`] = monthlyItem.monthlyDb;
+                        acc[`${monthKey}_exam`] = monthlyItem.monthlyTest;
+                        acc[`${monthKey}_surgery`] = monthlyItem.monthlySurgery;
+                    }
+                    return acc;
+                }, {})
+            };
+            return mappedData;
+        }) : [];
 
     } catch (error) {
         if (error.name === 'TypeError' && error.message.includes('fetch')) {
@@ -84,7 +97,7 @@ export async function updatePartnerInfo(partnerData, images = {}) {
             noticeDate2: partnerData.noticeDate2 || '',
             noticeDate3: partnerData.noticeDate3 || '',
             targetValue: partnerData.targetValue || '',
-            lastUpdated: partnerData.lastUpdated || ''
+            
         };
 
         // JSON을 Blob으로 변환해서 추가
@@ -92,11 +105,21 @@ export async function updatePartnerInfo(partnerData, images = {}) {
             type: 'application/json'
         }));
 
-        if (images.notice1Img) formData.append("noticeImg1", images.notice1Img);
-        if (images.notice2Img) formData.append("noticeImg2", images.notice2Img);
-        if (images.notice3Img) formData.append("noticeImg3", images.notice3Img);
+        ['noticeImg1', 'noticeImg2', 'noticeImg3'].forEach(imgField => {
+            if (images.hasOwnProperty(imgField)) { 
+                if (images[imgField] === null) {
+                    formData.append(imgField, new Blob([], { type: 'application/octet-stream' })); 
+                } else if (images[imgField] instanceof File) {
+                    // 새 파일이 있는 경우
+                    formData.append(imgField, images[imgField]);
+                }
+            }
+        });
 
         console.log('FormData 내용 확인:');
+        for (let pair of formData.entries()) {
+            console.log(pair[0]+ ', ' + pair[1]); 
+        }
 
         const response = await fetch(`${API_BASE_URL}/api/updatePartner`, {
             method: "POST",
@@ -139,6 +162,7 @@ export async function deletePartnerInfo(partnerId) {
         const response = await fetch(`${API_BASE_URL}/api/deletePartner`, {
             method: "DELETE",
             headers: { "Content-Type": "application/json"},
+            credentials: "include",
             body: JSON.stringify({ partnerId: partnerId })
         });
 
