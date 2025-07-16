@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { insertNotice } from "../../services/NoticeApi";
+import { writeNotice } from "../../services/NoticeApi";
 import "../styles/AdminNotice.css";
 
 function AdminNoticeWritePage({ setPage, onNoticeAdded }) {
@@ -33,7 +33,7 @@ function AdminNoticeWritePage({ setPage, onNoticeAdded }) {
         file: file ? file.name : null
       });
 
-      const result = await insertNotice(formData);
+      const result = await writeNotice(formData);
       console.log('등록 성공:', result)
 
       alert("공지사항이 등록되었습니다.");
