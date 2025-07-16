@@ -33,7 +33,7 @@ const GuestFrame = ({ onLogout }) => {
         // onLogout(); // 프론트테스트
     };
 
-    const [page, setPage] = useState('account');
+    const [page, setPage] = useState('board');
     const [expandedMenu, setExpandedMenu] = useState(null);
 
     const isMenuActive = (menuItem) => {
@@ -69,16 +69,6 @@ const GuestFrame = ({ onLogout }) => {
 
     const renderContent = () => {
         switch (page) {
-            case 'school1':
-                return <div>학교 1팀 관리 페이지</div>;
-            case 'school2':
-                return <div>학교 2팀 관리 페이지</div>;
-            case 'school3':
-                return <div>학교 3팀 관리 페이지</div>;
-            case 'military':
-                return <div>군대팀 관리 페이지</div>;
-            case 'enterprise':
-                return <div>기업팀 관리 페이지</div>;
             case 'alliance':
                 return <AffiliateBusiness />;
             case 'board':
