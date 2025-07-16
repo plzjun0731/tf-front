@@ -31,7 +31,7 @@ function App() {
     checkAuthStatus();
   }, []);
 
-  const handleLoginSuccess = (role) => {
+  const handleLoginSuccess = (role, name) => {
     try {
       setIsLoggedIn(true);
       setUserRole(role);
@@ -39,6 +39,7 @@ function App() {
       // sessionStorage에 로그인 정보 저장
       sessionStorage.setItem('isLoggedIn', 'true');
       sessionStorage.setItem('userRole', role);
+      sessionStorage.setItem('userID', name);
     } catch (error) {
       console.error('로그인 정보 저장 중 오류:', error);
     }

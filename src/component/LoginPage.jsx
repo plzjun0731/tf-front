@@ -16,9 +16,9 @@ function LoginPage({ onLoginSuccess }) {
             if (data.status === 0) {
                 alert("로그인 실패: 회원 정보가 없습니다.");
             } else if (data.status === 1) {
-                onLoginSuccess("admin");
+                onLoginSuccess("admin", userName);
             } else if (data.status === 2) {
-                onLoginSuccess("guest");
+                onLoginSuccess("guest", userName);
             } else {
                 alert("알 수 없는 응답입니다. 관리자에게 문의하세요.");
             }
