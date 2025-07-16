@@ -1,7 +1,7 @@
 // AdminAccountPage.jsx
 import React, { useState, useEffect } from "react";
 import { createUserAccount, getUserAccount } from "../../services/UserAccountApi";
-import "../styles/AdminAccount.css";
+import "../styles/admin/AdminAccount.css";
 
 function AdminAccountPage() {
     const [form, setForm] = useState({
