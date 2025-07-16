@@ -1,0 +1,246 @@
+:root {
+  /* Base */
+  --color-navy-dark: #1F2D3D; 
+  --color-navy-mid:  #192734;
+  --color-navy-light:#2A3A4A;
+
+  /* Accent */
+  --color-gold-light: #F5C542;
+  --color-gold-dark:  #D4AF37;
+
+  /* Transparencies */
+  --white-10: rgba(255,255,255,0.1);
+  --white-15: rgba(255,255,255,0.15);
+  --white-25: rgba(255,255,255,0.25);
+  --white-50: rgba(255,255,255,0.5);
+
+  /* Text */
+  --text-color: #FFFFFF;
+}
+
+.content-area {
+  padding:20px;
+}
+
+/* 공통 버튼 */
+.adac-save-button {
+  padding: 8px 15px;
+  background: var(--color-gold-light);
+  border: none;
+  color: var(--color-navy-dark);
+  text-align: center;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.adac-save-button:hover {
+  background-color: var(--color-gold-dark);
+  transform: translateY(1px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
+
+.adac-save-button.active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* 공통 입력창 */
+.input {
+  padding: 6px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: var(--white-15);
+  color: #ffffff;
+  margin: 10px;
+}
+
+.input:focus {
+  background-color: var(--white-25);
+  outline: none;
+}
+
+.input::placeholder {
+  color: var(--white-50);
+}
+
+/* 공통 테이블 */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+.table th {
+  background-color: var(--color-navy-dark);
+  color: white;
+  padding: 10px;
+}
+.table td {
+  background-color: var(--white-10);
+  color: #ffffff;
+  border: 1px solid #ccc;
+  padding: 10px;
+  text-align: center;
+}
+
+.input-group {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.input-group label {
+  font-weight: bold;
+}
+
+/* 반응형 디자인 */
+
+/* 태블릿 크기 */
+@media (max-width: 1024px) {
+  .content-area {
+    padding: 20px;
+  }
+  
+  .input-group {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 12px;
+    padding: 18px;
+  }
+  
+  .table th,
+  .table td {
+    padding: 10px 8px;
+    font-size: 14px;
+  }
+}
+
+/* 모바일 크기 */
+@media (max-width: 768px) {
+  .content-area {
+    padding: 15px;
+  }
+  
+  .input-group {
+    grid-template-columns: 1fr;
+    gap: 15px;
+    padding: 15px;
+  }
+  
+  .input-group label {
+    width: 100%;
+  }
+  
+  .input {
+    width: 100%;
+    min-height: 48px; /* 터치 친화적 크기 */
+    font-size: 16px; /* iOS 줌 방지 */
+  }
+  
+  .adac-save-button {
+    padding: 15px 25px;
+    font-size: 16px;
+    min-height: 50px;
+    max-width: none;
+  }
+  
+  /* 모바일에서 테이블을 카드 형태로 변경 */
+  .table-container {
+    border-radius: 8px;
+  }
+  
+  .table {
+    min-width: unset;
+  }
+  
+  .table thead {
+    display: none; /* 헤더 숨김 */
+  }
+  
+  .table tbody tr {
+    display: block;
+    background-color: var(--white-10);
+    border-radius: 8px;
+    margin-bottom: 15px;
+    padding: 15px;
+    border: 1px solid var(--white-15);
+  }
+  
+  .table tbody tr:hover {
+    background-color: var(--white-15);
+  }
+  
+  .table td {
+    display: block;
+    border: none;
+    padding: 8px 0;
+    text-align: left;
+    border-bottom: 1px solid var(--white-15);
+  }
+  
+  .table td:last-child {
+    border-bottom: none;
+  }
+  
+  /* 모바일 카드에서 라벨 추가 */
+  .table td:before {
+    content: attr(data-label);
+    font-weight: bold;
+    color: var(--color-gold-light);
+    display: inline-block;
+    width: 100px;
+    margin-right: 10px;
+  }
+  
+  .table td:nth-child(1):before { content: "번호: "; }
+  .table td:nth-child(2):before { content: "이름: "; }
+  .table td:nth-child(3):before { content: "아이디: "; }
+  .table td:nth-child(4):before { content: "비밀번호: "; }
+  .table td:nth-child(5):before { content: "이메일: "; }
+  .table td:nth-child(6):before { content: "전화번호: "; }
+  .table td:nth-child(7):before { content: "계정구분: "; }
+}
+
+/* 작은 모바일 */
+@media (max-width: 480px) {
+  .content-area {
+    padding: 10px;
+  }
+  
+  .input-group {
+    padding: 12px;
+    gap: 12px;
+  }
+  
+  .input {
+    padding: 12px;
+    font-size: 16px;
+  }
+  
+  .table tbody tr {
+    padding: 12px;
+  }
+  
+  .table td:before {
+    width: 90px;
+    font-size: 14px;
+  }
+}
+
+/* 가로 모드 처리 */
+@media (max-height: 600px) and (orientation: landscape) {
+  .content-area {
+    padding: 10px;
+  }
+  
+  .input-group {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    padding: 15px;
+    margin-bottom: 20px;
+  }
+}
+

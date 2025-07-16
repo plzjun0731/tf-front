@@ -1,0 +1,269 @@
+/* DB Management 컴포넌트 스타일 */
+.db-management {
+    width: 100%;
+    min-height: 100vh;
+    background-color: var(--color-navy-mid);
+    padding: 20px;
+    color: var(--text-color);
+    overflow-y: auto;
+    box-sizing: border-box;
+    border-radius: 8px;
+}
+
+.db-management .alert {
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    border-radius: 6px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    border-left: 4px solid;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.db-management .alert.success {
+    background: rgba(34, 197, 94, 0.1);
+    border-left-color: #22c55e;
+    color: #22c55e;
+}
+
+.db-management .alert.error {
+    background: rgba(239, 68, 68, 0.1);
+    border-left-color: #ef4444;
+    color: #ef4444;
+}
+
+.db-management .form-section {
+    background: var(--color-navy-light);
+    border-radius: 12px;
+    padding: 20px 30px;
+    margin-bottom: 24px;
+    border: 1px solid var(--white-15);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+.db-management .form-section h3 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 8px;
+    color: var(--color-gold-light);
+}
+
+.db-management .form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 24px;
+    max-width: 100%;
+}
+
+.db-management .form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.db-management .form-group label {
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: var(--text-color);
+    font-size: 1rem;
+}
+
+.db-management .form-group input,
+.db-management .form-group select {
+    padding: 10px 12px;
+    border: 1px solid var(--white-25);
+    border-radius: 6px;
+    background: var(--white-10);
+    color: var(--text-color);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.db-management .form-group input:focus,
+.db-management .form-group select:focus {
+    outline: none;
+    border-color: var(--color-gold-light);
+    box-shadow: 0 0 0 3px rgba(245, 197, 66, 0.1);
+}
+
+.db-management .form-group input::placeholder {
+    color: var(--white-50);   
+}
+
+.db-management .form-group select option {
+    background: var(--color-navy-mid);
+    color: var(--text-color);
+}
+
+.db-management .button-group {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.db-management .submit-button {
+    background: var(--color-gold-light);
+    color: var(--color-navy-dark);
+    padding: 10px 16px;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    font-size: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 120px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.db-management .submit-button:hover {
+    background: var(--color-gold-dark);
+    transform: translateY(1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.db-management .submit-button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.db-management .reset-btn {
+    background: var(--white-15) !important;
+    color: var(--text-color) !important;
+}
+
+.db-management .reset-btn:hover {
+    background: var(--white-25) !important;
+}
+
+.db-management .table-container {
+    background: var(--color-navy-light);
+    border-radius: 12px;
+    padding: 30px 40px;
+    border: 1px solid var(--white-15);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    overflow-x: auto;
+}
+
+.db-management .table-container h3 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: var(--color-gold-light);
+}
+
+.db-management .db-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 1000px;
+}
+
+.db-management .db-table th,
+.db-management .db-table td {
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--white-15);
+    white-space: nowrap;
+}
+
+.db-management .db-table th {
+    background: var(--color-navy-mid);
+    color: var(--text-color);
+    font-weight: bold;
+    font-size: 1rem;
+    border-bottom: 2px solid var(--white-25);
+    text-align: center;
+}
+
+.db-management .db-table tr:hover {
+    background: var(--white-15);
+}
+
+.db-management .db-table tbody td {
+    background-color: var(--white-10);
+    font-weight: 500;
+    color: var(--text-color);
+    text-align: center;
+}
+
+.db-management .no-data {
+    text-align: center !important;
+    padding: 40px !important;
+    color: var(--white-50);
+    font-style: italic;
+    font-size: 1rem;
+}
+
+.db-management .action-buttons {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+}
+
+.db-management .edit-btn,
+.db-management .delete-btn {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.db-management .edit-btn {
+    background: var(--color-gold-light);
+    color: var(--color-navy-dark);
+}
+
+.db-management .edit-btn:hover {
+    background: var(--color-gold-dark);
+    transform: translateY(1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.db-management .delete-btn {
+    background: #dc2626;
+    color: white;
+}
+
+.db-management .delete-btn:hover {
+    background: #ef4444;
+    transform: translateY(1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.db-management .table-container::-webkit-scrollbar {
+    height: 8px;
+}
+
+.db-management .table-container::-webkit-scrollbar-track {
+    background: var(--white-10);
+    border-radius: 4px;
+}
+
+.db-management .table-container::-webkit-scrollbar-thumb {
+    background: var(--color-gold-dark);
+    border-radius: 4px;
+}
+
+.db-management .table-container::-webkit-scrollbar-thumb:hover {
+    background: var(--color-gold-light);
+}
+
+.db-management::-webkit-scrollbar {
+    width: 8px;
+}
+
+.db-management::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.db-management::-webkit-scrollbar-thumb {
+    background: var(--color-gold-dark);
+    border-radius: 4px;
+}
+
+.db-management::-webkit-scrollbar-thumb:hover {
+    background: var(--color-gold-light);
+}

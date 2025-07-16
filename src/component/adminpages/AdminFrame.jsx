@@ -3,7 +3,9 @@ import React, { useState, useMemo } from 'react';
 import AdminAccountPage from './AdminAccountPage';
 import AffiliateBusiness from './AffiliateBusiness';
 import BoardPage from '../commonpages/BoardPage';
+import TeamManagement from './TeamManage/TeamManagementFrame';
 import Calendar from '../commonpages/Calendar';
+import { TeamDataProvider } from './TeamManage/TeamDataContext';
 import { logoutUser } from '../../services/LoginApi';
 import '../styles/Mainframe.css';
 
@@ -81,18 +83,28 @@ const AdminFrame = ({ onLogout }) => {
         }
     };
 
+    const getTeamName = (pageId) => {
+        const teamItem = MENU_ITEMS.find(item => item.id === 'team-manage');
+        if (teamItem && teamItem.subItems) {
+            const subItem = teamItem.subItems.find(item => item.id === pageId);
+            return subItem ? subItem.label : pageId;
+        }
+        return pageId;
+    };
+
     const renderContent = () => {
         switch (page) {
             case 'school1':
-                return <div>학교 1팀 관리 페이지</div>;
             case 'school2':
-                return <div>학교 2팀 관리 페이지</div>;
             case 'school3':
-                return <div>학교 3팀 관리 페이지</div>;
             case 'military':
-                return <div>군대팀 관리 페이지</div>;
             case 'enterprise':
-                return <div>기업팀 관리 페이지</div>;
+                return (
+                    <TeamDataProvider teamId={page} teamName={getTeamName(page)}>
+                        <TeamManagement />
+                    </TeamDataProvider>
+                );
+                
             case 'alliance':
                 return <AffiliateBusiness />;
             case 'board':
