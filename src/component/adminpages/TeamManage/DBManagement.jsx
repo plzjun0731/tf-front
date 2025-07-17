@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {useTeamData} from "./TeamDataContext";
 import "../../styles/admin/TeamManage/DBManagement.css";
 
@@ -9,9 +9,10 @@ const DBManagement = () => {
         partner: '',
         gender: '',
         contact: '',
+        reserve: '',    // 예약/미예약
         visitPlace: '',
         visitDate: '',
-        visitCountin: '',
+        visitCountin: '',   // 내원 확인
         manager: ''
     });
       
@@ -70,6 +71,7 @@ const DBManagement = () => {
             partner: '',
             gender: '',
             contact: '',
+            reserve: '',  
             visitPlace: '',
             visitDate: '',
             visitCountin: '',
@@ -84,6 +86,7 @@ const DBManagement = () => {
             partner: entry.partner,
             gender: entry.gender,
             contact: entry.contact,
+            reserve: entry.reserve,
             visitPlace: entry.visitPlace,
             visitDate: entry.visitDate,
             visitCountin: entry.visitCountin,
@@ -113,7 +116,7 @@ const DBManagement = () => {
                 <form onSubmit={handleSubmit}>
                     <div className="form-grid">
                         <div className="form-group">
-                            <label htmlFor="applicant">신청일자:</label>
+                            <label htmlFor="applicant">신청일자</label>
                             <input
                                 type="date"
                                 id="applicant"
@@ -125,7 +128,7 @@ const DBManagement = () => {
                             />
                         </div>
                         <div className="form-group">
-                            <label htmlFor="partner">제휴처:</label>
+                            <label htmlFor="partner">제휴처</label>
                             <input
                                 type="text"
                                 id="partner"
@@ -137,7 +140,7 @@ const DBManagement = () => {
                             />
                         </div>
                         <div className="form-group">
-                            <label htmlFor="gender">성함:</label>
+                            <label htmlFor="gender">성함</label>
                             <input
                                 type="text"
                                 id="gender"
@@ -148,7 +151,7 @@ const DBManagement = () => {
                             />
                         </div>
                         <div className="form-group">
-                            <label htmlFor="contact">연락처:</label>
+                            <label htmlFor="contact">연락처</label>
                             <input
                                 type="tel"
                                 id="contact"
@@ -159,7 +162,19 @@ const DBManagement = () => {
                             />
                         </div>
                         <div className="form-group">
-                            <label htmlFor="visitPlace">희망 지점:</label>
+                            <label htmlFor="reserve">예약 확인</label>
+                            <select 
+                                id="reserve"
+                                name="reserve"
+                                value={formData.reserve}
+                                onChange={handleInputChange}
+                            >
+                                <option value="미예약">미예약</option>
+                                <option value="예약">예약</option>
+                            </select>
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="visitPlace">희망 지점</label>
                             <select 
                                 id="visitPlace"
                                 name="visitPlace"
@@ -172,7 +187,7 @@ const DBManagement = () => {
                             </select>
                         </div>
                         <div className="form-group">
-                            <label htmlFor="visitDate">희망 내원일:</label>
+                            <label htmlFor="visitDate">희망 내원일</label>
                             <input
                                 type="date"
                                 id="visitDate"
@@ -182,18 +197,19 @@ const DBManagement = () => {
                             />
                         </div>
                         <div className="form-group">
-                            <label htmlFor="visitCountin">내원 확인:</label>
-                            <input
-                                type="text"
+                            <label htmlFor="visitCountin">내원 확인</label>
+                            <select 
                                 id="visitCountin"
                                 name="visitCountin"
                                 value={formData.visitCountin}
                                 onChange={handleInputChange}
-                                placeholder="내원 확인 입력"
-                            />
+                            >
+                                <option value="미내원">미내원</option>
+                                <option value="내원">내원</option>
+                            </select>
                         </div>
                         <div className="form-group">
-                            <label htmlFor="manager">담당자:</label>
+                            <label htmlFor="manager">담당자</label>
                             <input
                                 type="text"
                                 id="manager"
@@ -228,6 +244,7 @@ const DBManagement = () => {
                             <th>제휴처</th>
                             <th>성함</th>
                             <th>연락처</th>
+                            <th>예약 확인</th>
                             <th>희망 지점</th>
                             <th>희망 내원일</th>
                             <th>내원 확인</th>
@@ -238,7 +255,7 @@ const DBManagement = () => {
                     <tbody>
                         {teamData.dbEntries.length === 0 ? (
                             <tr>
-                                <td colSpan="9" className="no-data">
+                                <td colSpan="10" className="no-data">
                                     등록된 DB 정보가 없습니다.
                                 </td>
                             </tr>
@@ -249,6 +266,7 @@ const DBManagement = () => {
                                     <td>{entry.partner}</td>
                                     <td>{entry.gender}</td>
                                     <td>{entry.contact}</td>
+                                    <td>{entry.reserve}</td>
                                     <td>{entry.visitPlace}</td>
                                     <td>{entry.visitDate}</td>
                                     <td>{entry.visitCountin}</td>
