@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import '../../../styles/admin/TeamManage/ExecutiveManagement.css';
+import '../../styles/admin/TeamManage/ExecutiveManagement.css';
 
 const ExecutiveManagement = () => {
     const [executives, setExecutives] = useState([]);
