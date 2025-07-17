@@ -3,6 +3,7 @@ import PerformanceManagement from "./PerformanceManagement";
 import DBManagement from "./DBManagement";
 import { useTeamData } from "./TeamDataContext";
 import "../../styles/admin/TeamManage/TeamManagementFrame.css";
+import ExecutiveManagement from "./ExecutiveManagement.jsx"
 
 function TeamManagement() {
     const { teamId, teamName, teamData } = useTeamData();
@@ -20,7 +21,7 @@ function TeamManagement() {
             case 'performance':
                 return <PerformanceManagement />;
             case 'executive':
-                return <div>제휴처 임원 추가 기안서</div>;
+                return <ExecutiveManagement />;
             case 'database':
                 return <DBManagement />;
             case 'schedule':
